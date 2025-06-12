@@ -1,4 +1,7 @@
-# Welcome to your Lovable project
+
+# Cancer AI Beacon - Veille IA & Oncologie
+
+Application de veille technologique spécialisée dans l'intelligence artificielle appliquée à l'oncologie.
 
 ## Project info
 
@@ -62,7 +65,7 @@ This project is built with:
 
 ## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449) and click on Share -> Publish.
+This project is automatically deployed to GitHub Pages via GitHub Actions.
 
 ## Can I connect a custom domain to my Lovable project?
 
