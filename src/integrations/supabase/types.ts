@@ -9,7 +9,136 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          author: string | null
+          content: string | null
+          created_at: string
+          feed_id: string | null
+          id: string
+          keywords: string[] | null
+          published_at: string | null
+          relevance_score: number | null
+          summary: string | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          feed_id?: string | null
+          id?: string
+          keywords?: string[] | null
+          published_at?: string | null
+          relevance_score?: number | null
+          summary?: string | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          author?: string | null
+          content?: string | null
+          created_at?: string
+          feed_id?: string | null
+          id?: string
+          keywords?: string[] | null
+          published_at?: string | null
+          relevance_score?: number | null
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "articles_feed_id_fkey"
+            columns: ["feed_id"]
+            isOneToOne: false
+            referencedRelation: "rss_feeds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      categories: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      rss_feeds: {
+        Row: {
+          article_count: number | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          error_message: string | null
+          id: string
+          last_fetched_at: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          article_count?: number | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          id?: string
+          last_fetched_at?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          article_count?: number | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          error_message?: string | null
+          id?: string
+          last_fetched_at?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rss_feeds_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

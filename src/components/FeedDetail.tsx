@@ -1,31 +1,12 @@
 
 import { useState } from 'react';
-import { ArrowLeft, Calendar, ExternalLink, BookOpen, Clock, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Calendar, ExternalLink, BookOpen, Clock, TrendingUp, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ArticleDetail from './ArticleDetail';
-
-interface Feed {
-  id: number;
-  title: string;
-  url: string;
-  description: string;
-  articleCount: number;
-  lastUpdate: string;
-  category: string;
-  color: string;
-}
-
-interface Article {
-  id: number;
-  title: string;
-  summary: string;
-  publishDate: string;
-  author: string;
-  readTime: string;
-  url: string;
-}
+import { useArticles, useFetchArticles } from '@/hooks/useRSSFeeds';
+import type { Feed } from '@/hooks/useRSSFeeds';
 
 interface FeedDetailProps {
   feed: Feed;
@@ -33,38 +14,17 @@ interface FeedDetailProps {
 }
 
 const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
-  const [selectedArticleId, setSelectedArticleId] = useState<number | null>(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const { data: articles = [], isLoading } = useArticles(feed.id);
+  const fetchArticlesMutation = useFetchArticles();
 
-  // Données d'exemple pour les articles
-  const articles: Article[] = [
-    {
-      id: 1,
-      title: "Deep Learning Applications in Cancer Diagnosis: Recent Advances",
-      summary: "Une revue complète des dernières applications du deep learning dans le diagnostic du cancer, incluant l'analyse d'images médicales et la détection précoce.",
-      publishDate: "2024-06-10",
-      author: "Dr. Marie Dubois",
-      readTime: "8 min",
-      url: "https://example.com/article1"
-    },
-    {
-      id: 2,
-      title: "AI-Powered Precision Medicine in Oncology",
-      summary: "Comment l'intelligence artificielle révolutionne la médecine personnalisée en oncologie, avec des cas d'usage concrets et des résultats prometteurs.",
-      publishDate: "2024-06-09",
-      author: "Prof. Jean Martin",
-      readTime: "12 min",
-      url: "https://example.com/article2"
-    },
-    {
-      id: 3,
-      title: "Machine Learning for Drug Discovery in Cancer Treatment",
-      summary: "Les algorithmes de machine learning accélèrent la découverte de nouveaux traitements contre le cancer, réduisant les coûts et les délais.",
-      publishDate: "2024-06-08",
-      author: "Dr. Sophie Laurent",
-      readTime: "6 min",
-      url: "https://example.com/article3"
+  const handleRefreshFeed = async () => {
+    try {
+      await fetchArticlesMutation.mutateAsync(feed.id);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
     }
-  ];
+  };
 
   const selectedArticle = articles.find(article => article.id === selectedArticleId);
 
@@ -85,7 +45,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
           Retour
         </Button>
         <div className="flex items-center space-x-3">
-          <div className={`p-3 ${feed.color} rounded-xl shadow-lg`}>
+          <div className={`p-3 rounded-xl shadow-lg`} style={{ backgroundColor: feed.categories?.color || '#3B82F6' }}>
             <BookOpen className="w-6 h-6 text-white" />
           </div>
           <div>
@@ -93,6 +53,15 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
             <p className="text-muted-foreground">{feed.description}</p>
           </div>
         </div>
+        <Button 
+          variant="outline" 
+          onClick={handleRefreshFeed}
+          disabled={fetchArticlesMutation.isPending}
+          className="ml-auto hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
+        >
+          <RefreshCw className={`w-4 h-4 mr-2 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
+          Mettre à jour
+        </Button>
       </div>
 
       {/* Statistiques du flux */}
@@ -102,7 +71,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-blue-600 font-medium">Articles totaux</p>
-                <p className="text-2xl font-bold text-blue-700">{feed.articleCount}</p>
+                <p className="text-2xl font-bold text-blue-700">{articles.length}</p>
               </div>
               <BookOpen className="w-8 h-8 text-blue-500" />
             </div>
@@ -114,7 +83,9 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-green-600 font-medium">Dernière MAJ</p>
-                <p className="text-lg font-bold text-green-700">{feed.lastUpdate}</p>
+                <p className="text-lg font-bold text-green-700">
+                  {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : 'Jamais'}
+                </p>
               </div>
               <Calendar className="w-8 h-8 text-green-500" />
             </div>
@@ -125,8 +96,13 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Catégorie</p>
-                <p className="text-lg font-bold text-purple-700">{feed.category}</p>
+                <p className="text-sm text-purple-600 font-medium">Score moyen</p>
+                <p className="text-lg font-bold text-purple-700">
+                  {articles.length > 0 
+                    ? (articles.reduce((sum, article) => sum + (article.relevance_score || 0), 0) / articles.length).toFixed(1)
+                    : '0.0'
+                  }
+                </p>
               </div>
               <TrendingUp className="w-8 h-8 text-purple-500" />
             </div>
@@ -138,56 +114,89 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-foreground">Articles récents</h2>
         
-        <div className="space-y-4">
-          {articles.map((article) => (
-            <Card key={article.id} className="group hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <CardTitle className="text-lg text-foreground group-hover:text-blue-600 transition-colors cursor-pointer">
-                      {article.title}
-                    </CardTitle>
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
-                      {article.summary}
-                    </p>
+        {isLoading ? (
+          <div className="text-center py-8">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
+            <p>Chargement des articles...</p>
+          </div>
+        ) : articles.length === 0 ? (
+          <div className="text-center py-8">
+            <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">Aucun article</h3>
+            <p className="text-muted-foreground mb-4">Aucun article disponible pour ce flux.</p>
+            <Button onClick={handleRefreshFeed} disabled={fetchArticlesMutation.isPending}>
+              <RefreshCw className={`w-4 h-4 mr-2 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
+              Récupérer les articles
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {articles.map((article) => (
+              <Card key={article.id} className="group hover:shadow-md transition-all duration-300 hover:scale-[1.01]">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <CardTitle className="text-lg text-foreground group-hover:text-blue-600 transition-colors cursor-pointer">
+                        {article.title}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {article.summary}
+                      </p>
+                      {article.keywords && article.keywords.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {article.keywords.slice(0, 3).map((keyword, index) => (
+                            <Badge key={index} variant="outline" className="text-xs">
+                              {keyword}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div className="ml-4">
+                      <Badge 
+                        variant={article.relevance_score > 0.7 ? "default" : article.relevance_score > 0.5 ? "secondary" : "outline"}
+                        className="text-xs"
+                      >
+                        Score: {(article.relevance_score * 100).toFixed(0)}%
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                    <span className="flex items-center">
-                      <Calendar className="w-3 h-3 mr-1" />
-                      {article.publishDate}
-                    </span>
-                    <span className="flex items-center">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {article.readTime}
-                    </span>
-                    <span>Par {article.author}</span>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                      <span className="flex items-center">
+                        <Calendar className="w-3 h-3 mr-1" />
+                        {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
+                      </span>
+                      {article.author && (
+                        <span>Par {article.author}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => setSelectedArticleId(article.id)}
+                        className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                      >
+                        Lire plus
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => window.open(article.url, '_blank')}
+                        className="hover:bg-green-50 hover:text-green-700"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => setSelectedArticleId(article.id)}
-                      className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
-                    >
-                      Lire plus
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="hover:bg-green-50 hover:text-green-700"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
