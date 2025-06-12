@@ -17,7 +17,7 @@ const SimpleHeader = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold text-gray-900">Cancer AI Beacon</h1>
-              <p className="text-sm text-gray-600">Veille IA & Oncologie</p>
+              <p className="text-sm text-gray-600">AI & Oncology Watch</p>
             </div>
           </div>
           
@@ -29,7 +29,7 @@ const SimpleHeader = () => {
               className={location.pathname === '/' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : ''}
             >
               <Rss className="w-4 h-4 mr-2" />
-              Flux RSS
+              RSS Feeds
             </Button>
             <Button
               variant={location.pathname === '/about' ? 'default' : 'outline'}
@@ -38,7 +38,7 @@ const SimpleHeader = () => {
               className={location.pathname === '/about' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : ''}
             >
               <Info className="w-4 h-4 mr-2" />
-              À propos
+              About
             </Button>
           </nav>
         </div>
