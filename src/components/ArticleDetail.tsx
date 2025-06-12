@@ -3,16 +3,7 @@ import { ArrowLeft, Calendar, Clock, ExternalLink, User, BookOpen } from 'lucide
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-
-interface Article {
-  id: number;
-  title: string;
-  summary: string;
-  publishDate: string;
-  author: string;
-  readTime: string;
-  url: string;
-}
+import type { Article } from '@/hooks/useRSSFeeds';
 
 interface ArticleDetailProps {
   article: Article;
@@ -81,79 +72,129 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
           
           {/* Métadonnées de l'article */}
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-4">
-            <div className="flex items-center">
-              <User className="w-4 h-4 mr-1" />
-              {article.author}
-            </div>
+            {article.author && (
+              <div className="flex items-center">
+                <User className="w-4 h-4 mr-1" />
+                {article.author}
+              </div>
+            )}
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1" />
-              {article.publishDate}
+              {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
             </div>
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              {article.readTime} de lecture
+              5 min de lecture
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-6 md:p-8">
           {/* Résumé */}
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
-            <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
-              <BookOpen className="w-4 h-4 mr-2" />
-              Résumé
-            </h3>
-            <p className="text-blue-700 leading-relaxed">{article.summary}</p>
-          </div>
+          {article.summary && (
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
+              <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
+                <BookOpen className="w-4 h-4 mr-2" />
+                Résumé
+              </h3>
+              <p className="text-blue-700 leading-relaxed">{article.summary}</p>
+            </div>
+          )}
 
           {/* Contenu principal */}
           <div className="prose max-w-none">
             <div className="whitespace-pre-wrap text-foreground leading-relaxed">
-              {fullContent.split('\n').map((paragraph, index) => {
-                if (paragraph.trim() === '') return <br key={index} />;
-                
-                if (paragraph.startsWith('## ')) {
+              {article.content ? (
+                article.content.split('\n').map((paragraph, index) => {
+                  if (paragraph.trim() === '') return <br key={index} />;
+                  
+                  if (paragraph.startsWith('## ')) {
+                    return (
+                      <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
+                        {paragraph.replace('## ', '')}
+                      </h2>
+                    );
+                  }
+                  
+                  if (paragraph.startsWith('### ')) {
+                    return (
+                      <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
+                        {paragraph.replace('### ', '')}
+                      </h3>
+                    );
+                  }
+                  
+                  if (paragraph.trim().startsWith('- ')) {
+                    return (
+                      <li key={index} className="text-muted-foreground ml-4 mb-1">
+                        {paragraph.replace('- ', '')}
+                      </li>
+                    );
+                  }
+                  
                   return (
-                    <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
-                      {paragraph.replace('## ', '')}
-                    </h2>
+                    <p key={index} className="text-foreground mb-4 leading-relaxed">
+                      {paragraph}
+                    </p>
                   );
-                }
-                
-                if (paragraph.startsWith('### ')) {
+                })
+              ) : (
+                fullContent.split('\n').map((paragraph, index) => {
+                  if (paragraph.trim() === '') return <br key={index} />;
+                  
+                  if (paragraph.startsWith('## ')) {
+                    return (
+                      <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
+                        {paragraph.replace('## ', '')}
+                      </h2>
+                    );
+                  }
+                  
+                  if (paragraph.startsWith('### ')) {
+                    return (
+                      <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
+                        {paragraph.replace('### ', '')}
+                      </h3>
+                    );
+                  }
+                  
+                  if (paragraph.trim().startsWith('- ')) {
+                    return (
+                      <li key={index} className="text-muted-foreground ml-4 mb-1">
+                        {paragraph.replace('- ', '')}
+                      </li>
+                    );
+                  }
+                  
                   return (
-                    <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
-                      {paragraph.replace('### ', '')}
-                    </h3>
+                    <p key={index} className="text-foreground mb-4 leading-relaxed">
+                      {paragraph}
+                    </p>
                   );
-                }
-                
-                if (paragraph.trim().startsWith('- ')) {
-                  return (
-                    <li key={index} className="text-muted-foreground ml-4 mb-1">
-                      {paragraph.replace('- ', '')}
-                    </li>
-                  );
-                }
-                
-                return (
-                  <p key={index} className="text-foreground mb-4 leading-relaxed">
-                    {paragraph}
-                  </p>
-                );
-              })}
+                })
+              )}
             </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
             <div className="flex items-center space-x-2">
-              <Badge className="bg-green-100 text-green-800 border-green-200">
-                Intelligence Artificielle
-              </Badge>
-              <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                Oncologie
-              </Badge>
+              {article.keywords && article.keywords.length > 0 ? (
+                article.keywords.slice(0, 3).map((keyword, index) => (
+                  <Badge key={index} className="bg-green-100 text-green-800 border-green-200">
+                    {keyword}
+                  </Badge>
+                ))
+              ) : (
+                <>
+                  <Badge className="bg-green-100 text-green-800 border-green-200">
+                    Intelligence Artificielle
+                  </Badge>
+                  <Badge className="bg-purple-100 text-purple-800 border-purple-200">
+                    Oncologie
+                  </Badge>
+                </>
+              )}
             </div>
             
             <Button 
