@@ -11,8 +11,9 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Déterminer le basename en fonction de l'environnement
-  const basename = import.meta.env.PROD ? "/veille-ai-oncologie" : "";
+  // Détecter si on est sur GitHub Pages
+  const isGitHubPages = window.location.hostname.includes('github.io');
+  const basename = isGitHubPages ? "/veille-ai-oncologie" : "";
 
   return (
     <QueryClientProvider client={queryClient}>
