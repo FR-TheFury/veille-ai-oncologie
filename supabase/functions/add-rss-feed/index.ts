@@ -22,39 +22,45 @@ interface RSSFeed {
   items: RSSItem[];
 }
 
-// Parser RSS simple
+// Parser RSS simple pour Deno
 function parseRSS(xml: string): RSSFeed {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, 'text/xml');
+  // Utiliser des expressions régulières pour parser le XML car DOMParser n'est pas disponible
+  const titleMatch = xml.match(/<title[^>]*><!\[CDATA\[(.*?)\]\]><\/title>|<title[^>]*>(.*?)<\/title>/);
+  const descMatch = xml.match(/<description[^>]*><!\[CDATA\[(.*?)\]\]><\/description>|<description[^>]*>(.*?)<\/description>/);
   
-  const channel = doc.querySelector('channel');
-  if (!channel) {
-    throw new Error('Format RSS invalide');
-  }
-
-  const title = channel.querySelector('title')?.textContent || '';
-  const description = channel.querySelector('description')?.textContent || '';
+  const title = (titleMatch?.[1] || titleMatch?.[2] || '').trim();
+  const description = (descMatch?.[1] || descMatch?.[2] || '').trim();
   
+  // Extraire les items
   const items: RSSItem[] = [];
-  const itemElements = channel.querySelectorAll('item');
+  const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/g;
+  let itemMatch;
   
-  itemElements.forEach(item => {
-    const itemTitle = item.querySelector('title')?.textContent || '';
-    const itemDescription = item.querySelector('description')?.textContent || '';
-    const itemLink = item.querySelector('link')?.textContent || '';
-    const itemPubDate = item.querySelector('pubDate')?.textContent || '';
-    const itemAuthor = item.querySelector('author, dc\\:creator')?.textContent || '';
+  while ((itemMatch = itemRegex.exec(xml)) !== null) {
+    const itemXml = itemMatch[1];
+    
+    const itemTitleMatch = itemXml.match(/<title[^>]*><!\[CDATA\[(.*?)\]\]><\/title>|<title[^>]*>(.*?)<\/title>/);
+    const itemDescMatch = itemXml.match(/<description[^>]*><!\[CDATA\[(.*?)\]\]><\/description>|<description[^>]*>(.*?)<\/description>/);
+    const itemLinkMatch = itemXml.match(/<link[^>]*><!\[CDATA\[(.*?)\]\]><\/link>|<link[^>]*>(.*?)<\/link>/);
+    const itemPubDateMatch = itemXml.match(/<pubDate[^>]*><!\[CDATA\[(.*?)\]\]><\/pubDate>|<pubDate[^>]*>(.*?)<\/pubDate>/);
+    const itemAuthorMatch = itemXml.match(/<author[^>]*><!\[CDATA\[(.*?)\]\]><\/author>|<author[^>]*>(.*?)<\/author>|<dc:creator[^>]*><!\[CDATA\[(.*?)\]\]><\/dc:creator>|<dc:creator[^>]*>(.*?)<\/dc:creator>/);
+    
+    const itemTitle = (itemTitleMatch?.[1] || itemTitleMatch?.[2] || '').trim();
+    const itemDesc = (itemDescMatch?.[1] || itemDescMatch?.[2] || '').trim();
+    const itemLink = (itemLinkMatch?.[1] || itemLinkMatch?.[2] || '').trim();
+    const itemPubDate = (itemPubDateMatch?.[1] || itemPubDateMatch?.[2] || '').trim();
+    const itemAuthor = (itemAuthorMatch?.[1] || itemAuthorMatch?.[2] || itemAuthorMatch?.[3] || itemAuthorMatch?.[4] || '').trim();
     
     if (itemTitle && itemLink) {
       items.push({
         title: itemTitle,
-        description: itemDescription,
+        description: itemDesc,
         link: itemLink,
         pubDate: itemPubDate,
         author: itemAuthor
       });
     }
-  });
+  }
 
   return { title, description, items };
 }
@@ -63,19 +69,19 @@ function parseRSS(xml: string): RSSFeed {
 function detectCategory(title: string, description: string): string {
   const content = (title + ' ' + description).toLowerCase();
   
-  if (content.includes('nature') || content.includes('cell') || content.includes('science') || content.includes('lancet')) {
+  if (content.includes('nature') || content.includes('cell') || content.includes('science') || content.includes('lancet') || content.includes('jco') || content.includes('nejm')) {
     return 'Revues scientifiques';
   }
   if (content.includes('arxiv') || content.includes('biorxiv') || content.includes('medrxiv')) {
     return 'Prépublications';
   }
-  if (content.includes('pubmed') || content.includes('ieee')) {
+  if (content.includes('pubmed') || content.includes('ieee') || content.includes('clinicaltrials')) {
     return 'Bases de données';
   }
   if (content.includes('news') || content.includes('technology') || content.includes('mit')) {
     return 'Actualités';
   }
-  if (content.includes('inserm') || content.includes('nih') || content.includes('institut')) {
+  if (content.includes('inserm') || content.includes('nih') || content.includes('institut') || content.includes('nci') || content.includes('asco')) {
     return 'Instituts';
   }
   if (content.includes('conference') || content.includes('asco') || content.includes('miccai')) {
@@ -99,16 +105,31 @@ serve(async (req) => {
 
     console.log('Récupération du flux RSS:', url);
 
-    // Récupérer le flux RSS
-    const response = await fetch(url);
+    // Récupérer le flux RSS avec des headers pour éviter les blocages
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RSS-Bot/1.0)',
+        'Accept': 'application/rss+xml, application/xml, text/xml',
+      }
+    });
+    
     if (!response.ok) {
-      throw new Error(`Erreur lors de la récupération du flux: ${response.status}`);
+      throw new Error(`Erreur lors de la récupération du flux: ${response.status} - ${response.statusText}`);
     }
 
     const xmlContent = await response.text();
+    
+    if (!xmlContent || !xmlContent.includes('<rss') && !xmlContent.includes('<feed')) {
+      throw new Error('Le contenu récupéré ne semble pas être un flux RSS valide');
+    }
+
     const feed = parseRSS(xmlContent);
 
-    console.log('Flux RSS analysé:', feed.title);
+    if (!feed.title) {
+      throw new Error('Impossible d\'extraire le titre du flux RSS');
+    }
+
+    console.log('Flux RSS analysé:', feed.title, 'avec', feed.items.length, 'articles');
 
     // Initialiser Supabase
     const supabase = createClient(
@@ -127,7 +148,18 @@ serve(async (req) => {
       .single();
 
     if (!category) {
-      throw new Error('Catégorie non trouvée');
+      throw new Error(`Catégorie "${categoryName}" non trouvée`);
+    }
+
+    // Vérifier si le flux existe déjà
+    const { data: existingFeed } = await supabase
+      .from('rss_feeds')
+      .select('id')
+      .eq('url', url)
+      .single();
+
+    if (existingFeed) {
+      throw new Error('Ce flux RSS existe déjà');
     }
 
     // Insérer le flux RSS
@@ -139,7 +171,8 @@ serve(async (req) => {
         description: feed.description,
         category_id: category.id,
         article_count: feed.items.length,
-        last_fetched_at: new Date().toISOString()
+        last_fetched_at: new Date().toISOString(),
+        status: 'active'
       })
       .select()
       .single();
@@ -181,8 +214,18 @@ async function processArticles(items: RSSItem[], feedId: string, supabase: any) 
       // Convertir la date de publication
       let publishedAt = null;
       if (item.pubDate) {
-        publishedAt = new Date(item.pubDate).toISOString();
+        try {
+          publishedAt = new Date(item.pubDate).toISOString();
+        } catch (dateError) {
+          console.log('Erreur de conversion de date:', item.pubDate);
+        }
       }
+
+      // Nettoyer le contenu HTML
+      const cleanDescription = item.description
+        .replace(/<[^>]*>/g, '') // Supprimer les balises HTML
+        .replace(/&[^;]+;/g, ' ') // Supprimer les entités HTML
+        .trim();
 
       // Insérer l'article
       const { error } = await supabase
@@ -190,10 +233,10 @@ async function processArticles(items: RSSItem[], feedId: string, supabase: any) 
         .insert({
           feed_id: feedId,
           title: item.title,
-          summary: item.description.substring(0, 500) + '...', // Résumé temporaire
-          content: item.description,
+          summary: cleanDescription.length > 500 ? cleanDescription.substring(0, 497) + '...' : cleanDescription,
+          content: cleanDescription,
           url: item.link,
-          author: item.author,
+          author: item.author || null,
           published_at: publishedAt,
           relevance_score: 0.5 // Score par défaut
         });
