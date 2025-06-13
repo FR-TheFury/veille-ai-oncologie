@@ -3,6 +3,7 @@ import { ArrowLeft, Calendar, Clock, ExternalLink, User, BookOpen } from 'lucide
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useTranslation } from 'react-i18next';
 import type { Article } from '@/hooks/useRSSFeeds';
 
 interface ArticleDetailProps {
@@ -11,46 +12,48 @@ interface ArticleDetailProps {
 }
 
 const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
-  // Contenu d'exemple pour l'article
+  const { t } = useTranslation();
+
+  // Sample content for the article
   const fullContent = `
-    L'intelligence artificielle révolutionne le domaine de l'oncologie de manière spectaculaire. Les récentes avancées en deep learning permettent aux médecins de diagnostiquer certains types de cancer avec une précision dépassant parfois celle des experts humains.
+    Artificial intelligence is revolutionizing the field of oncology in spectacular ways. Recent advances in deep learning allow doctors to diagnose certain types of cancer with accuracy that sometimes exceeds that of human experts.
 
-    ## Applications principales
+    ## Main Applications
 
-    ### Diagnostic par imagerie
-    Les algorithmes de vision par ordinateur analysent les images médicales (scanners, IRM, radiographies) pour détecter des anomalies invisibles à l'œil nu. Cette technologie est particulièrement efficace pour :
-    - La détection précoce du cancer du poumon
-    - L'analyse des mammographies pour le cancer du sein
-    - L'examen des biopsies cutanées pour le mélanome
+    ### Diagnostic Imaging
+    Computer vision algorithms analyze medical images (scans, MRIs, X-rays) to detect anomalies invisible to the naked eye. This technology is particularly effective for:
+    - Early lung cancer detection
+    - Mammography analysis for breast cancer
+    - Skin biopsy examination for melanoma
 
-    ### Médecine personnalisée
-    L'IA permet de personnaliser les traitements en analysant :
-    - Le profil génétique du patient
-    - L'historique médical
-    - Les caractéristiques spécifiques de la tumeur
-    - La réponse aux traitements précédents
+    ### Personalized Medicine
+    AI enables treatment personalization by analyzing:
+    - Patient genetic profile
+    - Medical history
+    - Specific tumor characteristics
+    - Response to previous treatments
 
-    ## Résultats prometteurs
+    ## Promising Results
 
-    Les études récentes montrent des résultats encourageants :
-    - Réduction de 30% des erreurs de diagnostic
-    - Amélioration de 25% du taux de survie à 5 ans
-    - Diminution des effets secondaires grâce aux traitements personnalisés
+    Recent studies show encouraging results:
+    - 30% reduction in diagnostic errors
+    - 25% improvement in 5-year survival rate
+    - Reduction of side effects through personalized treatments
 
-    ## Défis et perspectives
+    ## Challenges and Perspectives
 
-    Malgré ces avancées, plusieurs défis demeurent :
-    - L'explicabilité des décisions de l'IA
-    - La validation clinique à grande échelle
-    - L'intégration dans les systèmes hospitaliers existants
-    - Les questions éthiques et réglementaires
+    Despite these advances, several challenges remain:
+    - Explainability of AI decisions
+    - Large-scale clinical validation
+    - Integration into existing hospital systems
+    - Ethical and regulatory questions
 
-    L'avenir s'annonce prometteur avec l'émergence de nouvelles techniques comme l'apprentissage fédéré et l'IA multimodale, qui pourront analyser simultanément différents types de données médicales.
+    The future looks promising with the emergence of new techniques like federated learning and multimodal AI, which will be able to simultaneously analyze different types of medical data.
   `;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header avec bouton retour */}
+      {/* Header with back button */}
       <div className="flex items-center space-x-4">
         <Button 
           variant="outline" 
@@ -58,19 +61,19 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
           className="hover:bg-gray-50"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
+          {t('article.back')}
         </Button>
-        <Badge variant="secondary">Article</Badge>
+        <Badge variant="secondary">{t('article.article')}</Badge>
       </div>
 
-      {/* Contenu principal de l'article */}
+      {/* Main article content */}
       <Card className="overflow-hidden">
         <CardHeader className="bg-gradient-to-r from-blue-50 to-purple-50 border-b">
           <CardTitle className="text-2xl md:text-3xl text-foreground leading-tight">
             {article.title}
           </CardTitle>
           
-          {/* Métadonnées de l'article */}
+          {/* Article metadata */}
           <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mt-4">
             {article.author && (
               <div className="flex items-center">
@@ -80,28 +83,28 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             )}
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1" />
-              {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
+              {article.published_at ? new Date(article.published_at).toLocaleDateString() : t('feed.unknownDate')}
             </div>
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              5 min de lecture
+              {t('article.readingTime', { minutes: 5 })}
             </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-6 md:p-8">
-          {/* Résumé */}
+          {/* Summary */}
           {article.summary && (
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
               <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
                 <BookOpen className="w-4 h-4 mr-2" />
-                Résumé
+                {t('article.summary')}
               </h3>
               <p className="text-blue-700 leading-relaxed">{article.summary}</p>
             </div>
           )}
 
-          {/* Contenu principal */}
+          {/* Main content */}
           <div className="prose max-w-none">
             <div className="whitespace-pre-wrap text-foreground leading-relaxed">
               {article.content ? (
@@ -188,10 +191,10 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
               ) : (
                 <>
                   <Badge className="bg-green-100 text-green-800 border-green-200">
-                    Intelligence Artificielle
+                    {t('article.defaultKeywords.ai')}
                   </Badge>
                   <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                    Oncologie
+                    {t('article.defaultKeywords.oncology')}
                   </Badge>
                 </>
               )}
@@ -202,7 +205,7 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
               onClick={() => window.open(article.url, '_blank')}
             >
               <ExternalLink className="w-4 h-4 mr-2" />
-              Voir l'article original
+              {t('article.viewOriginal')}
             </Button>
           </div>
         </CardContent>

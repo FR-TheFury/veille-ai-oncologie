@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ArticleDetail from './ArticleDetail';
 import { useArticles, useFetchArticles } from '@/hooks/useRSSFeeds';
+import { useTranslation } from 'react-i18next';
 import type { Feed } from '@/hooks/useRSSFeeds';
 
 interface FeedDetailProps {
@@ -14,6 +15,7 @@ interface FeedDetailProps {
 }
 
 const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
+  const { t } = useTranslation();
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const { data: articles = [], isLoading } = useArticles(feed.id);
   const fetchArticlesMutation = useFetchArticles();
@@ -22,7 +24,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
     try {
       await fetchArticlesMutation.mutateAsync(feed.id);
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      console.error('Error updating feed:', error);
     }
   };
 
@@ -34,7 +36,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
 
   return (
     <div className="space-y-6">
-      {/* Header avec bouton retour */}
+      {/* Header with back button */}
       <div className="flex items-center space-x-4">
         <Button 
           variant="outline" 
@@ -42,7 +44,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
           className="hover:bg-gray-50"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Retour
+          {t('feed.back')}
         </Button>
         <div className="flex items-center space-x-3">
           <div className={`p-3 rounded-xl shadow-lg`} style={{ backgroundColor: feed.categories?.color || '#3B82F6' }}>
@@ -60,17 +62,17 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
           className="ml-auto hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
         >
           <RefreshCw className={`w-4 h-4 mr-2 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
-          Mettre à jour
+          {t('feed.update')}
         </Button>
       </div>
 
-      {/* Statistiques du flux */}
+      {/* Feed statistics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-blue-600 font-medium">Articles totaux</p>
+                <p className="text-sm text-blue-600 font-medium">{t('feed.stats.totalArticles')}</p>
                 <p className="text-2xl font-bold text-blue-700">{articles.length}</p>
               </div>
               <BookOpen className="w-8 h-8 text-blue-500" />
@@ -82,9 +84,9 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-green-600 font-medium">Dernière MAJ</p>
+                <p className="text-sm text-green-600 font-medium">{t('feed.stats.lastUpdate')}</p>
                 <p className="text-lg font-bold text-green-700">
-                  {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : 'Jamais'}
+                  {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')}
                 </p>
               </div>
               <Calendar className="w-8 h-8 text-green-500" />
@@ -96,7 +98,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-purple-600 font-medium">Score moyen</p>
+                <p className="text-sm text-purple-600 font-medium">{t('feed.stats.averageScore')}</p>
                 <p className="text-lg font-bold text-purple-700">
                   {articles.length > 0 
                     ? (articles.reduce((sum, article) => sum + (article.relevance_score || 0), 0) / articles.length).toFixed(1)
@@ -110,23 +112,23 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
         </Card>
       </div>
 
-      {/* Liste des articles */}
+      {/* Articles list */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-bold text-foreground">Articles récents</h2>
+        <h2 className="text-2xl font-bold text-foreground">{t('feed.recentArticles')}</h2>
         
         {isLoading ? (
           <div className="text-center py-8">
             <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-            <p>Chargement des articles...</p>
+            <p>{t('feed.loadingArticles')}</p>
           </div>
         ) : articles.length === 0 ? (
           <div className="text-center py-8">
             <BookOpen className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">Aucun article</h3>
-            <p className="text-muted-foreground mb-4">Aucun article disponible pour ce flux.</p>
+            <h3 className="text-lg font-semibold mb-2">{t('feed.noArticles')}</h3>
+            <p className="text-muted-foreground mb-4">{t('feed.noArticlesSubtitle')}</p>
             <Button onClick={handleRefreshFeed} disabled={fetchArticlesMutation.isPending}>
               <RefreshCw className={`w-4 h-4 mr-2 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
-              Récupérer les articles
+              {t('feed.fetchArticles')}
             </Button>
           </div>
         ) : (
@@ -157,7 +159,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
                         variant={article.relevance_score > 0.7 ? "default" : article.relevance_score > 0.5 ? "secondary" : "outline"}
                         className="text-xs"
                       >
-                        Score: {(article.relevance_score * 100).toFixed(0)}%
+                        {t('feed.score', { score: (article.relevance_score * 100).toFixed(0) })}
                       </Badge>
                     </div>
                   </div>
@@ -167,10 +169,12 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <span className="flex items-center">
                         <Calendar className="w-3 h-3 mr-1" />
-                        {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
+                        {article.published_at ? t('feed.publishedOn', { 
+                          date: new Date(article.published_at).toLocaleDateString() 
+                        }) : t('feed.unknownDate')}
                       </span>
                       {article.author && (
-                        <span>Par {article.author}</span>
+                        <span>{t('feed.by', { author: article.author })}</span>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
@@ -180,7 +184,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
                         onClick={() => setSelectedArticleId(article.id)}
                         className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
                       >
-                        Lire plus
+                        {t('feed.readMore')}
                       </Button>
                       <Button 
                         variant="ghost" 

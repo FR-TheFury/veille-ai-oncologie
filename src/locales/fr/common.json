@@ -1,0 +1,221 @@
+
+{
+  "header": {
+    "title": "AI Veille Tech",
+    "subtitle": "Veille Technologique IA",
+    "rssFeeds": "Flux RSS",
+    "about": "À propos"
+  },
+  "rss": {
+    "title": "Flux RSS - IA & Oncologie",
+    "subtitle": "Suivez {count} sources spécialisées pour votre veille technologique",
+    "addFeed": "Ajouter",
+    "addPlaceholder": "URL du flux RSS...",
+    "loading": "Chargement des flux RSS...",
+    "noFeeds": "Aucun flux RSS",
+    "noFeedsSubtitle": "Ajoutez votre premier flux RSS pour commencer votre veille.",
+    "categories": {
+      "all": "Tous"
+    },
+    "stats": {
+      "feeds": "Flux RSS",
+      "articles": "Articles",
+      "categories": "Catégories",
+      "displayed": "Affichés"
+    },
+    "actions": {
+      "update": "MAJ",
+      "details": "Détails",
+      "view": "Voir",
+      "viewArticles": "Voir les articles",
+      "delete": "Supprimer"
+    },
+    "status": {
+      "error": "Erreur",
+      "uncategorized": "Non catégorisé",
+      "lastUpdated": "Mis à jour: {date}",
+      "never": "Jamais",
+      "articlesCount": "{count} articles"
+    }
+  },
+  "feed": {
+    "back": "Retour",
+    "update": "Mettre à jour",
+    "stats": {
+      "totalArticles": "Articles totaux",
+      "lastUpdate": "Dernière MAJ",
+      "averageScore": "Score moyen"
+    },
+    "recentArticles": "Articles récents",
+    "noArticles": "Aucun article",
+    "noArticlesSubtitle": "Aucun article disponible pour ce flux.",
+    "fetchArticles": "Récupérer les articles",
+    "loadingArticles": "Chargement des articles...",
+    "readMore": "Lire plus",
+    "score": "Score: {score}%",
+    "publishedOn": "{date}",
+    "by": "Par {author}",
+    "unknownDate": "Date inconnue"
+  },
+  "article": {
+    "back": "Retour",
+    "article": "Article",
+    "summary": "Résumé",
+    "readingTime": "{minutes} min de lecture",
+    "keywords": "Mots-clés",
+    "viewOriginal": "Voir l'article original",
+    "defaultKeywords": {
+      "ai": "Intelligence Artificielle",
+      "oncology": "Oncologie"
+    }
+  },
+  "about": {
+    "title": "Notre Veille Technologique",
+    "subtitle": "Intelligence Artificielle en Oncologie : Une approche systématique de suivi des innovations révolutionnaires pour MSPR 4",
+    "backToFeeds": "Retour aux Flux RSS",
+    "projectContext": {
+      "title": "Contexte du Projet MSPR 4",
+      "description": "Cette veille technologique est menée dans le cadre de notre projet MSPR 4 (Méthode et Pratique de Situation Professionnelle). Nous sommes 4 développeurs chargés de surveiller et d'analyser les dernières avancées en applications IA pour l'oncologie.",
+      "areas": {
+        "earlyDetection": {
+          "title": "Détection Précoce",
+          "description": "IA pour la détection automatisée de cellules cancéreuses"
+        },
+        "personalizedTreatment": {
+          "title": "Traitement Personnalisé",
+          "description": "Médecine de précision basée sur l'analyse de données"
+        },
+        "acceleratedResearch": {
+          "title": "Recherche Accélérée",
+          "description": "Découverte de médicaments assistée par IA"
+        }
+      }
+    },
+    "team": {
+      "title": "Notre Équipe de Développement",
+      "description": "Une équipe pluridisciplinaire de 4 développeurs couvrant les aspects techniques, médicaux et éthiques :",
+      "expertise": {
+        "technical": "Expertise Technique IA",
+        "medical": "Connaissances Médicales",
+        "regulatory": "Analyse Réglementaire",
+        "competitive": "Intelligence Concurrentielle"
+      }
+    },
+    "methodology": {
+      "title": "Notre Méthodologie",
+      "sources": {
+        "title": "Sources Diversifiées",
+        "items": [
+          "Flux RSS multiples couvrant plusieurs catégories",
+          "Revues scientifiques: Nature, Cell, Science",
+          "Prépublications: arXiv, bioRxiv, medRxiv",
+          "Conférences: MICCAI, ASCO",
+          "Instituts: NIH, INSERM",
+          "Tech News: MIT Tech Review"
+        ]
+      },
+      "analysis": {
+        "title": "Analyse Systématique",
+        "items": [
+          "Surveillance quotidienne des publications",
+          "Filtrage par mots-clés spécialisés",
+          "Classification par impact potentiel",
+          "Réunions de synthèse hebdomadaires",
+          "Alertes technologies révolutionnaires"
+        ]
+      }
+    },
+    "challenges": {
+      "title": "Défis Clés Identifiés",
+      "ethical": {
+        "title": "Enjeux Éthiques",
+        "items": [
+          "Biais algorithmiques",
+          "Transparence des décisions",
+          "Consentement éclairé",
+          "Protection des données"
+        ]
+      },
+      "technical": {
+        "title": "Défis Techniques",
+        "items": [
+          "Qualité des données",
+          "Interopérabilité",
+          "Validation clinique",
+          "Robustesse des modèles"
+        ]
+      },
+      "opportunities": {
+        "title": "Opportunités",
+        "items": [
+          "Diagnostic ultra-précoce",
+          "Médecine personnalisée",
+          "Réduction des coûts",
+          "Accessibilité mondiale"
+        ]
+      }
+    },
+    "trends": {
+      "title": "Tendances Émergentes 2024",
+      "multimodal": {
+        "title": "IA Multimodale",
+        "description": "Intégration d'imagerie médicale, données génomiques et historiques patients pour diagnostic holistique"
+      },
+      "foundation": {
+        "title": "Modèles Fondamentaux",
+        "description": "Modèles pré-entraînés adaptables à différents types de cancer et modalités d'imagerie"
+      },
+      "explainable": {
+        "title": "IA Explicable",
+        "description": "Développement de systèmes transparents pour la confiance des cliniciens et patients"
+      },
+      "edge": {
+        "title": "Edge Computing",
+        "description": "Déploiement d'IA embarquée pour analyse en temps réel lors d'interventions chirurgicales"
+      }
+    },
+    "stats": {
+      "title": "Notre Veille en Chiffres"
+    },
+    "objectives": {
+      "title": "Objectifs d'Apprentissage MSPR 4",
+      "technical": {
+        "title": "Compétences Techniques",
+        "items": [
+          "Collecte et analyse d'informations",
+          "Identification des tendances technologiques",
+          "Évaluation critique des sources",
+          "Synthèse et reporting"
+        ]
+      },
+      "professional": {
+        "title": "Compétences Professionnelles",
+        "items": [
+          "Collaboration en équipe",
+          "Gestion de projet",
+          "Compétences de présentation",
+          "Pensée stratégique"
+        ]
+      }
+    },
+    "cta": "Explorer nos Flux RSS"
+  },
+  "stats": {
+    "feeds": "Sources RSS",
+    "articles": "Articles total",
+    "categories": "Catégories",
+    "developers": "Développeurs",
+    "loading": "Chargement..."
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "retry": "Réessayer",
+    "save": "Sauvegarder",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "close": "Fermer",
+    "open": "Ouvrir"
+  }
+}

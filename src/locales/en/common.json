@@ -1,0 +1,221 @@
+
+{
+  "header": {
+    "title": "AI Tech Watch",
+    "subtitle": "AI Technology Watch",
+    "rssFeeds": "RSS Feeds",
+    "about": "About"
+  },
+  "rss": {
+    "title": "RSS Feeds - AI & Oncology",
+    "subtitle": "Follow {count} specialized sources for your technology watch",
+    "addFeed": "Add",
+    "addPlaceholder": "RSS feed URL...",
+    "loading": "Loading RSS feeds...",
+    "noFeeds": "No RSS feeds",
+    "noFeedsSubtitle": "Add your first RSS feed to start your watch.",
+    "categories": {
+      "all": "All"
+    },
+    "stats": {
+      "feeds": "RSS Feeds",
+      "articles": "Articles",
+      "categories": "Categories",
+      "displayed": "Displayed"
+    },
+    "actions": {
+      "update": "Update",
+      "details": "Details",
+      "view": "View",
+      "viewArticles": "View articles",
+      "delete": "Delete"
+    },
+    "status": {
+      "error": "Error",
+      "uncategorized": "Uncategorized",
+      "lastUpdated": "Updated: {date}",
+      "never": "Never",
+      "articlesCount": "{count} articles"
+    }
+  },
+  "feed": {
+    "back": "Back",
+    "update": "Update",
+    "stats": {
+      "totalArticles": "Total articles",
+      "lastUpdate": "Last update",
+      "averageScore": "Average score"
+    },
+    "recentArticles": "Recent articles",
+    "noArticles": "No articles",
+    "noArticlesSubtitle": "No articles available for this feed.",
+    "fetchArticles": "Fetch articles",
+    "loadingArticles": "Loading articles...",
+    "readMore": "Read more",
+    "score": "Score: {score}%",
+    "publishedOn": "{date}",
+    "by": "By {author}",
+    "unknownDate": "Unknown date"
+  },
+  "article": {
+    "back": "Back",
+    "article": "Article",
+    "summary": "Summary",
+    "readingTime": "{minutes} min read",
+    "keywords": "Keywords",
+    "viewOriginal": "View original article",
+    "defaultKeywords": {
+      "ai": "Artificial Intelligence",
+      "oncology": "Oncology"
+    }
+  },
+  "about": {
+    "title": "Our Technology Watch",
+    "subtitle": "Artificial Intelligence in Oncology: A systematic approach to tracking revolutionary innovations for MSPR 4",
+    "backToFeeds": "Back to RSS Feeds",
+    "projectContext": {
+      "title": "MSPR 4 Project Context",
+      "description": "This technology watch is conducted as part of our MSPR 4 project (Professional Situation Methods and Practice). We are 4 developers responsible for monitoring and analyzing the latest advances in AI applications for oncology.",
+      "areas": {
+        "earlyDetection": {
+          "title": "Early Detection",
+          "description": "AI for automated cancer cell detection"
+        },
+        "personalizedTreatment": {
+          "title": "Personalized Treatment",
+          "description": "Precision medicine based on data analysis"
+        },
+        "acceleratedResearch": {
+          "title": "Accelerated Research",
+          "description": "AI-assisted drug discovery"
+        }
+      }
+    },
+    "team": {
+      "title": "Our Development Team",
+      "description": "A multidisciplinary team of 4 developers covering technical, medical and ethical aspects:",
+      "expertise": {
+        "technical": "AI Technical Expertise",
+        "medical": "Medical Knowledge",
+        "regulatory": "Regulatory Analysis",
+        "competitive": "Competitive Intelligence"
+      }
+    },
+    "methodology": {
+      "title": "Our Methodology",
+      "sources": {
+        "title": "Diversified Sources",
+        "items": [
+          "Multiple RSS feeds covering several categories",
+          "Scientific journals: Nature, Cell, Science",
+          "Preprints: arXiv, bioRxiv, medRxiv",
+          "Conferences: MICCAI, ASCO",
+          "Institutes: NIH, INSERM",
+          "Tech News: MIT Tech Review"
+        ]
+      },
+      "analysis": {
+        "title": "Systematic Analysis",
+        "items": [
+          "Daily publication monitoring",
+          "Specialized keyword filtering",
+          "Classification by potential impact",
+          "Weekly synthesis meetings",
+          "Revolutionary technology alerts"
+        ]
+      }
+    },
+    "challenges": {
+      "title": "Key Challenges Identified",
+      "ethical": {
+        "title": "Ethical Issues",
+        "items": [
+          "Algorithmic bias",
+          "Decision transparency",
+          "Informed consent",
+          "Data protection"
+        ]
+      },
+      "technical": {
+        "title": "Technical Challenges",
+        "items": [
+          "Data quality",
+          "Interoperability",
+          "Clinical validation",
+          "Model robustness"
+        ]
+      },
+      "opportunities": {
+        "title": "Opportunities",
+        "items": [
+          "Ultra-early diagnosis",
+          "Personalized medicine",
+          "Cost reduction",
+          "Global accessibility"
+        ]
+      }
+    },
+    "trends": {
+      "title": "Emerging Trends 2024",
+      "multimodal": {
+        "title": "Multimodal AI",
+        "description": "Integration of medical imaging, genomic data and patient histories for holistic diagnosis"
+      },
+      "foundation": {
+        "title": "Foundation Models",
+        "description": "Pre-trained models adaptable to different cancer types and imaging modalities"
+      },
+      "explainable": {
+        "title": "Explainable AI",
+        "description": "Development of transparent systems for clinician and patient trust"
+      },
+      "edge": {
+        "title": "Edge Computing",
+        "description": "Deployment of embedded AI for real-time analysis during surgical interventions"
+      }
+    },
+    "stats": {
+      "title": "Our Watch in Numbers"
+    },
+    "objectives": {
+      "title": "MSPR 4 Learning Objectives",
+      "technical": {
+        "title": "Technical Skills",
+        "items": [
+          "Information collection and analysis",
+          "Technology trend identification",
+          "Critical source evaluation",
+          "Synthesis and reporting"
+        ]
+      },
+      "professional": {
+        "title": "Professional Skills",
+        "items": [
+          "Team collaboration",
+          "Project management",
+          "Presentation skills",
+          "Strategic thinking"
+        ]
+      }
+    },
+    "cta": "Explore our RSS Feeds"
+  },
+  "stats": {
+    "feeds": "RSS Sources",
+    "articles": "Total Articles",
+    "categories": "Categories",
+    "developers": "Developers",
+    "loading": "Loading..."
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "retry": "Retry",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "open": "Open"
+  }
+}

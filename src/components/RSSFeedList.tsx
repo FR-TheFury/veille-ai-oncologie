@@ -7,20 +7,22 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import FeedDetail from './FeedDetail';
 import { useRSSFeeds, useAddRSSFeed, useFetchArticles } from '@/hooks/useRSSFeeds';
+import { useTranslation } from 'react-i18next';
 
 const RSSFeedList = () => {
+  const { t } = useTranslation();
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('Tous');
+  const [selectedCategory, setSelectedCategory] = useState<string>(t('rss.categories.all'));
 
   const { data: feeds = [], isLoading } = useRSSFeeds();
   const addFeedMutation = useAddRSSFeed();
   const fetchArticlesMutation = useFetchArticles();
 
-  // Extraire les catégories uniques des flux
-  const categories = ['Tous', ...Array.from(new Set(feeds.map(feed => feed.categories?.name).filter(Boolean)))];
+  // Extract unique categories from feeds
+  const categories = [t('rss.categories.all'), ...Array.from(new Set(feeds.map(feed => feed.categories?.name).filter(Boolean)))];
   
-  const filteredFeeds = selectedCategory === 'Tous' 
+  const filteredFeeds = selectedCategory === t('rss.categories.all')
     ? feeds 
     : feeds.filter(feed => feed.categories?.name === selectedCategory);
 
@@ -33,7 +35,7 @@ const RSSFeedList = () => {
       await addFeedMutation.mutateAsync(newFeedUrl.trim());
       setNewFeedUrl('');
     } catch (error) {
-      console.error('Erreur lors de l\'ajout du flux:', error);
+      console.error('Error adding feed:', error);
     }
   };
 
@@ -41,7 +43,7 @@ const RSSFeedList = () => {
     try {
       await fetchArticlesMutation.mutateAsync(feedId);
     } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
+      console.error('Error updating feed:', error);
     }
   };
 
@@ -54,7 +56,7 @@ const RSSFeedList = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <RefreshCw className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p>Chargement des flux RSS...</p>
+          <p>{t('rss.loading')}</p>
         </div>
       </div>
     );
@@ -65,15 +67,15 @@ const RSSFeedList = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Flux RSS - IA & Oncologie
+            {t('rss.title')}
           </h2>
           <p className="text-muted-foreground mt-1">
-            Suivez {feeds.length} sources spécialisées pour votre veille technologique
+            {t('rss.subtitle', { count: feeds.length })}
           </p>
         </div>
         <div className="flex space-x-2">
           <Input
-            placeholder="URL du flux RSS..."
+            placeholder={t('rss.addPlaceholder')}
             value={newFeedUrl}
             onChange={(e) => setNewFeedUrl(e.target.value)}
             className="w-64 bg-background/50 backdrop-blur-sm"
@@ -89,12 +91,12 @@ const RSSFeedList = () => {
             ) : (
               <Plus className="w-4 h-4 mr-2" />
             )}
-            Ajouter
+            {t('rss.addFeed')}
           </Button>
         </div>
       </div>
 
-      {/* Filtres par catégorie */}
+      {/* Category filters */}
       <div className="flex items-center space-x-3">
         <Filter className="w-4 h-4 text-muted-foreground" />
         <div className="flex flex-wrap gap-2">
@@ -110,7 +112,7 @@ const RSSFeedList = () => {
               }
             >
               {category}
-              {category !== 'Tous' && (
+              {category !== t('rss.categories.all') && (
                 <Badge variant="secondary" className="ml-2 text-xs">
                   {feeds.filter(feed => feed.categories?.name === category).length}
                 </Badge>
@@ -120,13 +122,13 @@ const RSSFeedList = () => {
         </div>
       </div>
 
-      {/* Statistiques */}
+      {/* Statistics */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
           <CardContent className="p-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-blue-700">{feeds.length}</p>
-              <p className="text-sm text-blue-600">Flux RSS</p>
+              <p className="text-sm text-blue-600">{t('rss.stats.feeds')}</p>
             </div>
           </CardContent>
         </Card>
@@ -134,7 +136,7 @@ const RSSFeedList = () => {
           <CardContent className="p-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-green-700">{feeds.reduce((sum, feed) => sum + (feed.article_count || 0), 0)}</p>
-              <p className="text-sm text-green-600">Articles</p>
+              <p className="text-sm text-green-600">{t('rss.stats.articles')}</p>
             </div>
           </CardContent>
         </Card>
@@ -142,7 +144,7 @@ const RSSFeedList = () => {
           <CardContent className="p-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-purple-700">{categories.length - 1}</p>
-              <p className="text-sm text-purple-600">Catégories</p>
+              <p className="text-sm text-purple-600">{t('rss.stats.categories')}</p>
             </div>
           </CardContent>
         </Card>
@@ -150,7 +152,7 @@ const RSSFeedList = () => {
           <CardContent className="p-4">
             <div className="text-center">
               <p className="text-2xl font-bold text-orange-700">{filteredFeeds.length}</p>
-              <p className="text-sm text-orange-600">Affichés</p>
+              <p className="text-sm text-orange-600">{t('rss.stats.displayed')}</p>
             </div>
           </CardContent>
         </Card>
@@ -171,11 +173,11 @@ const RSSFeedList = () => {
                         {feed.title}
                       </CardTitle>
                       <Badge variant="secondary" className="text-xs">
-                        {feed.categories?.name || 'Non catégorisé'}
+                        {feed.categories?.name || t('rss.status.uncategorized')}
                       </Badge>
                       {feed.status === 'error' && (
                         <Badge variant="destructive" className="text-xs">
-                          Erreur
+                          {t('rss.status.error')}
                         </Badge>
                       )}
                     </div>
@@ -191,7 +193,7 @@ const RSSFeedList = () => {
                     className="hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
                   >
                     <RefreshCw className={`w-3 h-3 mr-1 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
-                    MAJ
+                    {t('rss.actions.update')}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -200,7 +202,7 @@ const RSSFeedList = () => {
                     className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
                   >
                     <Eye className="w-3 h-3 mr-1" />
-                    Détails
+                    {t('rss.actions.details')}
                   </Button>
                   <Button 
                     variant="outline" 
@@ -209,7 +211,7 @@ const RSSFeedList = () => {
                     className="hover:bg-green-50 hover:border-green-300 hover:text-green-700"
                   >
                     <ExternalLink className="w-3 h-3 mr-1" />
-                    Voir
+                    {t('rss.actions.view')}
                   </Button>
                 </div>
               </div>
@@ -219,12 +221,14 @@ const RSSFeedList = () => {
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <span className="flex items-center">
                     <Calendar className="w-3 h-3 mr-1" />
-                    Mis à jour: {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : 'Jamais'}
+                    {t('rss.status.lastUpdated', { 
+                      date: feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')
+                    })}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
-                    {feed.article_count || 0} articles
+                    {t('rss.status.articlesCount', { count: feed.article_count || 0 })}
                   </Badge>
                   <Button 
                     variant="ghost" 
@@ -232,7 +236,7 @@ const RSSFeedList = () => {
                     onClick={() => setSelectedFeedId(feed.id)}
                     className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                   >
-                    Voir les articles
+                    {t('rss.actions.viewArticles')}
                     <ArrowRight className="w-3 h-3 ml-1" />
                   </Button>
                 </div>
@@ -245,8 +249,8 @@ const RSSFeedList = () => {
       {feeds.length === 0 && (
         <div className="text-center py-12">
           <Rss className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">Aucun flux RSS</h3>
-          <p className="text-muted-foreground mb-4">Ajoutez votre premier flux RSS pour commencer votre veille.</p>
+          <h3 className="text-lg font-semibold mb-2">{t('rss.noFeeds')}</h3>
+          <p className="text-muted-foreground mb-4">{t('rss.noFeedsSubtitle')}</p>
         </div>
       )}
     </div>

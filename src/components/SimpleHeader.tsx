@@ -2,10 +2,13 @@
 import { Info, Rss, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSelector from './LanguageSelector';
 
 const SimpleHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -16,8 +19,8 @@ const SimpleHeader = () => {
               <Globe className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">AI Veille Tech</h1>
-              <p className="text-sm text-gray-600">Veille Technologique IA</p>
+              <h1 className="text-xl font-bold text-gray-900">{t('header.title')}</h1>
+              <p className="text-sm text-gray-600">{t('header.subtitle')}</p>
             </div>
           </div>
           
@@ -29,7 +32,7 @@ const SimpleHeader = () => {
               className={location.pathname === '/' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : ''}
             >
               <Rss className="w-4 h-4 mr-2" />
-              RSS Feeds
+              {t('header.rssFeeds')}
             </Button>
             <Button
               variant={location.pathname === '/about' ? 'default' : 'outline'}
@@ -38,8 +41,9 @@ const SimpleHeader = () => {
               className={location.pathname === '/about' ? 'bg-gradient-to-r from-blue-600 to-purple-600' : ''}
             >
               <Info className="w-4 h-4 mr-2" />
-              About
+              {t('header.about')}
             </Button>
+            <LanguageSelector />
           </nav>
         </div>
       </div>
