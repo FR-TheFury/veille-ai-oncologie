@@ -105,28 +105,44 @@ export function useDeleteRSSFeed() {
 
   return useMutation({
     mutationFn: async (feedId: string) => {
-      // First delete all articles for this feed
+      console.log('Début de la suppression du feed:', feedId);
+      
+      // D'abord supprimer tous les articles du flux
+      console.log('Suppression des articles...');
       const { error: articlesError } = await supabase
         .from('articles')
         .delete()
         .eq('feed_id', feedId);
 
-      if (articlesError) throw articlesError;
+      if (articlesError) {
+        console.error('Erreur lors de la suppression des articles:', articlesError);
+        throw articlesError;
+      }
+      console.log('Articles supprimés avec succès');
 
-      // Then delete the feed
+      // Ensuite supprimer le flux
+      console.log('Suppression du flux...');
       const { error: feedError } = await supabase
         .from('rss_feeds')
         .delete()
         .eq('id', feedId);
 
-      if (feedError) throw feedError;
+      if (feedError) {
+        console.error('Erreur lors de la suppression du flux:', feedError);
+        throw feedError;
+      }
+      console.log('Flux supprimé avec succès');
+
+      return { success: true };
     },
     onSuccess: () => {
+      console.log('Suppression terminée, invalidation des caches...');
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
       queryClient.invalidateQueries({ queryKey: ['articles'] });
       toast.success('Flux RSS supprimé avec succès !');
     },
     onError: (error: any) => {
+      console.error('Erreur de suppression:', error);
       toast.error(error.message || 'Erreur lors de la suppression du flux RSS');
     },
   });

@@ -83,11 +83,11 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             )}
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1" />
-              {article.published_at ? new Date(article.published_at).toLocaleDateString() : t('feed.unknownDate')}
+              {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
             </div>
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              {t('article.readingTime', { minutes: 5 })}
+              Lecture : 5 minutes
             </div>
           </div>
         </CardHeader>
@@ -191,10 +191,10 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
               ) : (
                 <>
                   <Badge className="bg-green-100 text-green-800 border-green-200">
-                    {t('article.defaultKeywords.ai')}
+                    Intelligence Artificielle
                   </Badge>
                   <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                    {t('article.defaultKeywords.oncology')}
+                    Oncologie
                   </Badge>
                 </>
               )}

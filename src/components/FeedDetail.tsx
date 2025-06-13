@@ -159,7 +159,7 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
                         variant={article.relevance_score > 0.7 ? "default" : article.relevance_score > 0.5 ? "secondary" : "outline"}
                         className="text-xs"
                       >
-                        {t('feed.score', { score: (article.relevance_score * 100).toFixed(0) })}
+                        {Math.round((article.relevance_score || 0) * 100)}%
                       </Badge>
                     </div>
                   </div>
@@ -169,12 +169,10 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <span className="flex items-center">
                         <Calendar className="w-3 h-3 mr-1" />
-                        {article.published_at ? t('feed.publishedOn', { 
-                          date: new Date(article.published_at).toLocaleDateString() 
-                        }) : t('feed.unknownDate')}
+                        Publié le {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
                       </span>
                       {article.author && (
-                        <span>{t('feed.by', { author: article.author })}</span>
+                        <span>par {article.author}</span>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
