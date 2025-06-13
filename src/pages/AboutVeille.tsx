@@ -12,6 +12,15 @@ const AboutVeille = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
+  // Properly type the arrays from translations
+  const sourceItems = t('about.methodology.sources.items', { returnObjects: true }) as string[];
+  const analysisItems = t('about.methodology.analysis.items', { returnObjects: true }) as string[];
+  const ethicalItems = t('about.challenges.ethical.items', { returnObjects: true }) as string[];
+  const technicalItems = t('about.challenges.technical.items', { returnObjects: true }) as string[];
+  const opportunityItems = t('about.challenges.opportunities.items', { returnObjects: true }) as string[];
+  const technicalObjectiveItems = t('about.objectives.technical.items', { returnObjects: true }) as string[];
+  const professionalObjectiveItems = t('about.objectives.professional.items', { returnObjects: true }) as string[];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="max-w-6xl mx-auto p-6">
@@ -106,7 +115,7 @@ const AboutVeille = () => {
                   {t('about.methodology.sources.title')}
                 </h4>
                 <ul className="space-y-2 text-sm">
-                  {t('about.methodology.sources.items', { returnObjects: true }).map((item: string, index: number) => (
+                  {sourceItems.map((item: string, index: number) => (
                     <li key={index}>• <strong>{item.split(':')[0]}:</strong> {item.split(':')[1]}</li>
                   ))}
                 </ul>
@@ -117,7 +126,7 @@ const AboutVeille = () => {
                   {t('about.methodology.analysis.title')}
                 </h4>
                 <ul className="space-y-2 text-sm">
-                  {t('about.methodology.analysis.items', { returnObjects: true }).map((item: string, index: number) => (
+                  {analysisItems.map((item: string, index: number) => (
                     <li key={index}>• {item}</li>
                   ))}
                 </ul>
@@ -145,7 +154,7 @@ const AboutVeille = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <ul className="text-sm space-y-1 text-red-600">
-                    {t('about.challenges.ethical.items', { returnObjects: true }).map((item: string, index: number) => (
+                    {ethicalItems.map((item: string, index: number) => (
                       <li key={index}>• {item}</li>
                     ))}
                   </ul>
@@ -161,7 +170,7 @@ const AboutVeille = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <ul className="text-sm space-y-1 text-blue-600">
-                    {t('about.challenges.technical.items', { returnObjects: true }).map((item: string, index: number) => (
+                    {technicalItems.map((item: string, index: number) => (
                       <li key={index}>• {item}</li>
                     ))}
                   </ul>
@@ -177,7 +186,7 @@ const AboutVeille = () => {
                 </CardHeader>
                 <CardContent className="pt-0">
                   <ul className="text-sm space-y-1 text-green-600">
-                    {t('about.challenges.opportunities.items', { returnObjects: true }).map((item: string, index: number) => (
+                    {opportunityItems.map((item: string, index: number) => (
                       <li key={index}>• {item}</li>
                     ))}
                   </ul>
@@ -254,7 +263,7 @@ const AboutVeille = () => {
               <div>
                 <h4 className="font-semibold text-lg mb-3">{t('about.objectives.technical.title')}</h4>
                 <ul className="space-y-2 text-sm">
-                  {t('about.objectives.technical.items', { returnObjects: true }).map((item: string, index: number) => (
+                  {technicalObjectiveItems.map((item: string, index: number) => (
                     <li key={index}>• {item}</li>
                   ))}
                 </ul>
@@ -262,7 +271,7 @@ const AboutVeille = () => {
               <div>
                 <h4 className="font-semibold text-lg mb-3">{t('about.objectives.professional.title')}</h4>
                 <ul className="space-y-2 text-sm">
-                  {t('about.objectives.professional.items', { returnObjects: true }).map((item: string, index: number) => (
+                  {professionalObjectiveItems.map((item: string, index: number) => (
                     <li key={index}>• {item}</li>
                   ))}
                 </ul>
