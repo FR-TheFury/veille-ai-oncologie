@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -105,52 +106,77 @@ export function useDeleteRSSFeed() {
 
   return useMutation({
     mutationFn: async (feedId: string) => {
-      console.log('🔴 DÉBUT SUPPRESSION DIRECTE - Feed ID:', feedId);
+      console.log('🔴 DÉBUT SUPPRESSION - Feed ID:', feedId);
       
       try {
-        // Étape 1: Vérifier que le feed existe
+        // Vérification que le feed existe d'abord
         console.log('🔍 Vérification existence du feed...');
         const { data: feedExists, error: checkError } = await supabase
           .from('rss_feeds')
-          .select('id, title')
+          .select('id, title, url')
           .eq('id', feedId)
           .single();
 
         if (checkError) {
-          console.error('❌ Erreur lors de la vérification du feed:', checkError);
+          console.error('❌ Feed introuvable:', checkError);
           throw new Error(`Feed introuvable: ${checkError.message}`);
         }
 
         console.log('✅ Feed trouvé:', feedExists);
 
-        // Étape 2: Supprimer tous les articles du flux d'abord (relation)
-        console.log('🗑️ Suppression des articles...');
-        const { error: articlesError } = await supabase
+        // ÉTAPE 1: Supprimer les articles associés d'abord
+        console.log('🗑️ ÉTAPE 1: Suppression des articles associés...');
+        const { error: deleteArticlesError, count: deletedArticlesCount } = await supabase
           .from('articles')
-          .delete()
+          .delete({ count: 'exact' })
           .eq('feed_id', feedId);
 
-        if (articlesError) {
-          console.error('❌ Erreur lors de la suppression des articles:', articlesError);
-          throw new Error(`Erreur suppression articles: ${articlesError.message}`);
+        if (deleteArticlesError) {
+          console.error('❌ Erreur suppression articles:', deleteArticlesError);
+          throw new Error(`Erreur lors de la suppression des articles: ${deleteArticlesError.message}`);
         }
-        console.log('✅ Articles supprimés avec succès');
 
-        // Étape 3: Supprimer le flux RSS
-        console.log('🗑️ Suppression du flux RSS...');
-        const { error: feedError } = await supabase
+        console.log(`✅ ${deletedArticlesCount || 0} articles supprimés`);
+
+        // ÉTAPE 2: Supprimer le flux RSS lui-même
+        console.log('🗑️ ÉTAPE 2: Suppression du flux RSS...');
+        const { error: deleteFeedError, count: deletedFeedsCount } = await supabase
           .from('rss_feeds')
-          .delete()
+          .delete({ count: 'exact' })
           .eq('id', feedId);
 
-        if (feedError) {
-          console.error('❌ Erreur lors de la suppression du flux:', feedError);
-          throw new Error(`Erreur suppression flux: ${feedError.message}`);
+        if (deleteFeedError) {
+          console.error('❌ Erreur suppression flux:', deleteFeedError);
+          throw new Error(`Erreur lors de la suppression du flux: ${deleteFeedError.message}`);
         }
-        console.log('✅ Flux RSS supprimé avec succès');
 
-        console.log('🎉 SUPPRESSION RÉUSSIE');
-        return { success: true, feedTitle: feedExists.title, feedId };
+        if (deletedFeedsCount === 0) {
+          console.error('❌ Aucun flux supprimé - vérifiez les permissions RLS');
+          throw new Error('Aucun flux n\'a été supprimé. Vérifiez les permissions.');
+        }
+
+        console.log(`✅ ${deletedFeedsCount} flux RSS supprimé`);
+
+        // Vérification finale que le feed a bien été supprimé
+        console.log('🔍 Vérification finale...');
+        const { data: verifyDeleted } = await supabase
+          .from('rss_feeds')
+          .select('id')
+          .eq('id', feedId)
+          .single();
+
+        if (verifyDeleted) {
+          console.error('❌ Le flux existe encore après suppression !');
+          throw new Error('Le flux n\'a pas été supprimé correctement');
+        }
+
+        console.log('🎉 SUPPRESSION CONFIRMÉE - Le flux a bien été supprimé');
+        return { 
+          success: true, 
+          feedTitle: feedExists.title, 
+          feedId,
+          deletedArticles: deletedArticlesCount || 0
+        };
 
       } catch (error) {
         console.error('💥 ERREUR DANS LA SUPPRESSION:', error);
@@ -158,7 +184,7 @@ export function useDeleteRSSFeed() {
       }
     },
     onMutate: async (feedId: string) => {
-      console.log('🔄 DÉBUT onMutate - Mise à jour optimiste...');
+      console.log('🔄 Mise à jour optimiste du cache...');
       
       await queryClient.cancelQueries({ queryKey: ['rss-feeds'] });
       
@@ -167,35 +193,32 @@ export function useDeleteRSSFeed() {
       queryClient.setQueryData(['rss-feeds'], (old: Feed[] | undefined) => {
         if (!old) return [];
         const filtered = old.filter(feed => feed.id !== feedId);
-        console.log('🎯 Feed retiré du cache optimiste, nouvelle liste:', filtered.length, 'feeds');
+        console.log('🎯 Feed retiré du cache (optimiste)');
         return filtered;
       });
       
-      console.log('✅ Mise à jour optimiste terminée');
       return { previousFeeds };
     },
     onSuccess: (data, feedId) => {
       console.log('🎉 onSuccess - Suppression réussie !');
       
-      // Force le rechargement des données
+      // Force le rechargement complet des données
       queryClient.refetchQueries({ queryKey: ['rss-feeds'] });
       queryClient.removeQueries({ queryKey: ['articles', feedId] });
       
-      console.log('✅ Cache mis à jour');
-      toast.success(`Flux RSS "${data.feedTitle}" supprimé avec succès !`);
+      toast.success(`Flux "${data.feedTitle}" supprimé définitivement ! (${data.deletedArticles} articles supprimés)`);
     },
     onError: (error: any, feedId: string, context: any) => {
-      console.error('🚨 onError - Suppression échouée, restauration...');
+      console.error('🚨 onError - Restauration du cache...');
       
       if (context?.previousFeeds) {
         queryClient.setQueryData(['rss-feeds'], context.previousFeeds);
       }
       
-      console.error('🚨 ERREUR FINALE:', error);
-      toast.error(`Erreur lors de la suppression: ${error.message}`);
+      toast.error(`Erreur: ${error.message}`);
     },
     onSettled: () => {
-      console.log('🏁 onSettled - Nettoyage final...');
+      console.log('🏁 Nettoyage final du cache...');
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
     }
   });
