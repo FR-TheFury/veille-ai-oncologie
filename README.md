@@ -1,76 +1,108 @@
 
-# Cancer AI Beacon - Veille IA & Oncologie
+# AI Veille Tech - Veille IA & Technologie
 
-Application de veille technologique spécialisée dans l'intelligence artificielle appliquée à l'oncologie.
+Application de veille technologique spécialisée dans l'intelligence artificielle et les nouvelles technologies.
 
-## Project info
+## À propos du projet
 
-**URL**: https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449
+AI Veille Tech est une plateforme moderne de veille technologique qui permet de suivre les dernières actualités et innovations dans le domaine de l'intelligence artificielle et des technologies émergentes.
 
-## How can I edit this code?
+**URL du projet**: https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449
 
-There are several ways of editing your application.
+## Fonctionnalités
 
-**Use Lovable**
+- 📡 Agrégation de flux RSS spécialisés en IA et technologie
+- 🔍 Système de veille automatisé
+- 📊 Interface moderne et responsive
+- 🏷️ Catégorisation des articles
+- ⭐ Système de pertinence des contenus
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449) and start prompting.
+## Comment modifier ce code ?
 
-Changes made via Lovable will be committed automatically to this repo.
+Il existe plusieurs façons de modifier cette application.
 
-**Use your preferred IDE**
+**Utiliser Lovable**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Visitez simplement le [Projet Lovable](https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449) et commencez à donner des instructions.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Les modifications effectuées via Lovable seront automatiquement commitées dans ce dépôt.
 
-Follow these steps:
+**Utiliser votre IDE préféré**
+
+Si vous souhaitez travailler localement avec votre propre IDE, vous pouvez cloner ce dépôt et pousser les modifications. Les modifications poussées seront également reflétées dans Lovable.
+
+La seule exigence est d'avoir Node.js et npm installés - [installer avec nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+
+Suivez ces étapes :
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Étape 1 : Cloner le dépôt en utilisant l'URL Git du projet
+git clone <VOTRE_URL_GIT>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Étape 2 : Naviguer vers le répertoire du projet
+cd <NOM_DE_VOTRE_PROJET>
 
-# Step 3: Install the necessary dependencies.
+# Étape 3 : Installer les dépendances nécessaires
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Étape 4 : Démarrer le serveur de développement avec rechargement automatique
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+**Modifier un fichier directement dans GitHub**
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Naviguez vers le(s) fichier(s) souhaité(s)
+- Cliquez sur le bouton "Edit" (icône crayon) en haut à droite de la vue du fichier
+- Effectuez vos modifications et commitez les changements
 
-**Use GitHub Codespaces**
+**Utiliser GitHub Codespaces**
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- Naviguez vers la page principale de votre dépôt
+- Cliquez sur le bouton "Code" (bouton vert) près du coin supérieur droit
+- Sélectionnez l'onglet "Codespaces"
+- Cliquez sur "New codespace" pour lancer un nouvel environnement Codespace
+- Modifiez les fichiers directement dans le Codespace et commitez puis poussez vos modifications une fois terminé
 
-## What technologies are used for this project?
+## Technologies utilisées
 
-This project is built with:
+Ce projet est construit avec :
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- ⚡ Vite
+- 📘 TypeScript
+- ⚛️ React
+- 🎨 shadcn-ui
+- 🎯 Tailwind CSS
+- 🗄️ Supabase (Backend)
+- 🔄 TanStack Query (Gestion d'état)
 
-## How can I deploy this project?
+## Comment déployer ce projet ?
 
-This project is automatically deployed to GitHub Pages via GitHub Actions.
+Ce projet est automatiquement déployé sur GitHub Pages via GitHub Actions.
 
-## Can I connect a custom domain to my Lovable project?
+## Puis-je connecter un domaine personnalisé ?
 
-Yes, you can!
+Oui, c'est possible !
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+Pour connecter un domaine, naviguez vers Project > Settings > Domains et cliquez sur Connect Domain.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+En savoir plus ici : [Configuration d'un domaine personnalisé](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## Structure du projet
+
+```
+src/
+├── components/          # Composants React réutilisables
+├── pages/              # Pages de l'application
+├── hooks/              # Hooks personnalisés
+├── integrations/       # Intégrations externes (Supabase)
+├── lib/                # Utilitaires et configurations
+└── index.css          # Styles globaux
+```
+
+## Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou soumettre une pull request.
+
+## Licence
+
+Ce projet est sous licence MIT.
