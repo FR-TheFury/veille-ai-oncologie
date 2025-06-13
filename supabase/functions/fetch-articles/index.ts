@@ -1,4 +1,3 @@
-
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -10,30 +9,33 @@ const corsHeaders = {
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-async function generateSummaryAndScore(title: string, content: string): Promise<{summary: string, score: number, keywords: string[]}> {
+async function generateSummaryAndScore(title: string, content: string): Promise<{summary: string, score: number, keywords: string[], keyPoints: string[]}> {
   if (!openAIApiKey) {
     return {
-      summary: content.substring(0, 200) + '...',
+      summary: content.substring(0, 400) + '...',
       score: 0.5,
-      keywords: []
+      keywords: [],
+      keyPoints: []
     };
   }
 
   try {
     const prompt = `
 Analyse cet article scientifique et fournis :
-1. Un résumé en français de 2-3 phrases maximum
+1. Un résumé détaillé en français de 4-6 phrases qui explique clairement le contexte, les méthodes, et les résultats
 2. Un score de pertinence (0-1) pour l'IA appliquée à l'oncologie
 3. Les mots-clés principaux (maximum 5)
+4. Une liste de 3-5 points clés à retenir de l'article (phrases courtes et impactantes)
 
 Titre: ${title}
-Contenu: ${content.substring(0, 1000)}
+Contenu: ${content.substring(0, 2000)}
 
 Réponds au format JSON:
 {
-  "summary": "résumé en français",
+  "summary": "résumé détaillé en français de 4-6 phrases",
   "score": 0.8,
-  "keywords": ["mot1", "mot2", "mot3"]
+  "keywords": ["mot1", "mot2", "mot3"],
+  "keyPoints": ["Point clé 1", "Point clé 2", "Point clé 3"]
 }`;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -55,14 +57,16 @@ Réponds au format JSON:
     return {
       summary: result.summary,
       score: Math.min(Math.max(result.score, 0), 1),
-      keywords: result.keywords || []
+      keywords: result.keywords || [],
+      keyPoints: result.keyPoints || []
     };
   } catch (error) {
     console.error('Erreur IA:', error);
     return {
-      summary: content.substring(0, 200) + '...',
+      summary: content.substring(0, 400) + '...',
       score: 0.5,
-      keywords: []
+      keywords: [],
+      keyPoints: []
     };
   }
 }
@@ -189,7 +193,8 @@ serve(async (req) => {
           author: item.author ? item.author.substring(0, 100) : null,
           published_at: item.pubDate ? new Date(item.pubDate).toISOString() : null,
           relevance_score: aiResult.score,
-          keywords: aiResult.keywords
+          keywords: aiResult.keywords,
+          key_points: aiResult.keyPoints
         });
 
       if (!error) {

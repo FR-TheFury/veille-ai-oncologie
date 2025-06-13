@@ -32,6 +32,7 @@ export interface Article {
   published_at: string;
   relevance_score: number;
   keywords: string[];
+  key_points?: string[];
   created_at: string;
 }
 

@@ -1,5 +1,4 @@
-
-import { ArrowLeft, Calendar, Clock, ExternalLink, User, BookOpen } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, ExternalLink, User, BookOpen, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -87,7 +86,7 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             </div>
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              Lecture : 5 minutes
+              Lecture : 8-10 minutes
             </div>
           </div>
         </CardHeader>
@@ -98,9 +97,27 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
               <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
                 <BookOpen className="w-4 h-4 mr-2" />
-                {t('article.summary')}
+                Résumé détaillé
               </h3>
               <p className="text-blue-700 leading-relaxed">{article.summary}</p>
+            </div>
+          )}
+
+          {/* Key Points Section */}
+          {article.key_points && article.key_points.length > 0 && (
+            <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6 rounded-r-lg">
+              <h3 className="font-semibold text-amber-800 mb-3 flex items-center">
+                <Lightbulb className="w-4 h-4 mr-2" />
+                Points clés à retenir
+              </h3>
+              <ul className="space-y-2">
+                {article.key_points.map((point, index) => (
+                  <li key={index} className="text-amber-700 leading-relaxed flex items-start">
+                    <span className="text-amber-500 mr-2 mt-1">•</span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
             </div>
           )}
 
