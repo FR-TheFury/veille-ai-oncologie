@@ -22,14 +22,31 @@ interface RSSFeed {
   items: RSSItem[];
 }
 
-// Parser RSS simple pour Deno
+// Parser RSS amélioré pour Deno
 function parseRSS(xml: string): RSSFeed {
-  // Utiliser des expressions régulières pour parser le XML car DOMParser n'est pas disponible
-  const titleMatch = xml.match(/<title[^>]*><!\[CDATA\[(.*?)\]\]><\/title>|<title[^>]*>(.*?)<\/title>/);
-  const descMatch = xml.match(/<description[^>]*><!\[CDATA\[(.*?)\]\]><\/description>|<description[^>]*>(.*?)<\/description>/);
+  // Nettoyer le XML d'abord
+  xml = xml.replace(/^\uFEFF/, ''); // Supprimer BOM
+  xml = xml.trim();
   
-  const title = (titleMatch?.[1] || titleMatch?.[2] || '').trim();
-  const description = (descMatch?.[1] || descMatch?.[2] || '').trim();
+  console.log('Tentative de parsing XML, longueur:', xml.length);
+  
+  // Vérifier si c'est un flux Atom ou RSS
+  const isAtom = xml.includes('<feed') && xml.includes('xmlns');
+  
+  if (isAtom) {
+    return parseAtomFeed(xml);
+  } else {
+    return parseRSSFeed(xml);
+  }
+}
+
+function parseRSSFeed(xml: string): RSSFeed {
+  // Extraire le titre et la description du canal
+  const channelTitleMatch = xml.match(/<title[^>]*><!\[CDATA\[(.*?)\]\]><\/title>|<title[^>]*>(.*?)<\/title>/);
+  const channelDescMatch = xml.match(/<description[^>]*><!\[CDATA\[(.*?)\]\]><\/description>|<description[^>]*>(.*?)<\/description>/);
+  
+  const title = (channelTitleMatch?.[1] || channelTitleMatch?.[2] || 'RSS Feed').trim();
+  const description = (channelDescMatch?.[1] || channelDescMatch?.[2] || '').trim();
   
   // Extraire les items
   const items: RSSItem[] = [];
@@ -65,11 +82,52 @@ function parseRSS(xml: string): RSSFeed {
   return { title, description, items };
 }
 
+function parseAtomFeed(xml: string): RSSFeed {
+  // Parser pour les flux Atom
+  const titleMatch = xml.match(/<title[^>]*>(.*?)<\/title>/);
+  const subtitleMatch = xml.match(/<subtitle[^>]*>(.*?)<\/subtitle>/);
+  
+  const title = (titleMatch?.[1] || 'Atom Feed').trim();
+  const description = (subtitleMatch?.[1] || '').trim();
+  
+  const items: RSSItem[] = [];
+  const entryRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/g;
+  let entryMatch;
+  
+  while ((entryMatch = entryRegex.exec(xml)) !== null) {
+    const entryXml = entryMatch[1];
+    
+    const entryTitleMatch = entryXml.match(/<title[^>]*>(.*?)<\/title>/);
+    const entrySummaryMatch = entryXml.match(/<summary[^>]*>(.*?)<\/summary>/);
+    const entryLinkMatch = entryXml.match(/<link[^>]*href="([^"]*)"[^>]*>/);
+    const entryUpdatedMatch = entryXml.match(/<updated[^>]*>(.*?)<\/updated>/);
+    const entryAuthorMatch = entryXml.match(/<author[^>]*>[\s\S]*?<name[^>]*>(.*?)<\/name>/);
+    
+    const entryTitle = (entryTitleMatch?.[1] || '').trim();
+    const entrySummary = (entrySummaryMatch?.[1] || '').trim();
+    const entryLink = (entryLinkMatch?.[1] || '').trim();
+    const entryUpdated = (entryUpdatedMatch?.[1] || '').trim();
+    const entryAuthor = (entryAuthorMatch?.[1] || '').trim();
+    
+    if (entryTitle && entryLink) {
+      items.push({
+        title: entryTitle,
+        description: entrySummary,
+        link: entryLink,
+        pubDate: entryUpdated,
+        author: entryAuthor
+      });
+    }
+  }
+
+  return { title, description, items };
+}
+
 // Déterminer la catégorie automatiquement
 function detectCategory(title: string, description: string): string {
   const content = (title + ' ' + description).toLowerCase();
   
-  if (content.includes('nature') || content.includes('cell') || content.includes('science') || content.includes('lancet') || content.includes('jco') || content.includes('nejm')) {
+  if (content.includes('nature') || content.includes('cell') || content.includes('science') || content.includes('lancet') || content.includes('jco') || content.includes('nejm') || content.includes('cancer') || content.includes('oncology')) {
     return 'Revues scientifiques';
   }
   if (content.includes('arxiv') || content.includes('biorxiv') || content.includes('medrxiv')) {
@@ -91,6 +149,52 @@ function detectCategory(title: string, description: string): string {
   return 'Actualités'; // Catégorie par défaut
 }
 
+async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
+  const userAgents = [
+    'Mozilla/5.0 (compatible; RSS-Bot/1.0)',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+    'feedparser-python/6.0.8 +https://pythonhosted.org/feedparser/'
+  ];
+
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      console.log(`Tentative ${i + 1}/${maxRetries} pour ${url}`);
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': userAgents[i % userAgents.length],
+          'Accept': 'application/rss+xml, application/xml, text/xml, application/atom+xml, text/html',
+          'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8',
+          'Accept-Encoding': 'gzip, deflate',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        },
+        redirect: 'follow'
+      });
+
+      if (response.ok) {
+        return response;
+      }
+
+      console.log(`Tentative ${i + 1} échouée avec le statut ${response.status}: ${response.statusText}`);
+      
+      if (response.status === 403 || response.status === 429) {
+        // Attendre un peu plus longtemps pour ces erreurs
+        await new Promise(resolve => setTimeout(resolve, (i + 1) * 2000));
+      } else if (response.status === 404) {
+        throw new Error(`URL non trouvée: ${response.status} - ${response.statusText}`);
+      }
+    } catch (error) {
+      console.log(`Erreur lors de la tentative ${i + 1}:`, error.message);
+      if (i === maxRetries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, (i + 1) * 1000));
+    }
+  }
+
+  throw new Error('Toutes les tentatives ont échoué');
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -105,28 +209,26 @@ serve(async (req) => {
 
     console.log('Récupération du flux RSS:', url);
 
-    // Récupérer le flux RSS avec des headers pour éviter les blocages
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; RSS-Bot/1.0)',
-        'Accept': 'application/rss+xml, application/xml, text/xml',
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`Erreur lors de la récupération du flux: ${response.status} - ${response.statusText}`);
-    }
-
+    // Récupérer le flux RSS avec retry
+    const response = await fetchWithRetry(url);
     const xmlContent = await response.text();
     
-    if (!xmlContent || !xmlContent.includes('<rss') && !xmlContent.includes('<feed')) {
-      throw new Error('Le contenu récupéré ne semble pas être un flux RSS valide');
+    console.log('Contenu récupéré, longueur:', xmlContent.length);
+    console.log('Début du contenu:', xmlContent.substring(0, 200));
+
+    if (!xmlContent || xmlContent.length < 50) {
+      throw new Error('Le contenu récupéré semble vide ou trop court');
+    }
+
+    // Vérifier si c'est du XML valide
+    if (!xmlContent.includes('<') || (!xmlContent.includes('<rss') && !xmlContent.includes('<feed') && !xmlContent.includes('<channel'))) {
+      throw new Error('Le contenu récupéré ne semble pas être un flux RSS/XML valide');
     }
 
     const feed = parseRSS(xmlContent);
 
-    if (!feed.title) {
-      throw new Error('Impossible d\'extraire le titre du flux RSS');
+    if (!feed.title || feed.title === 'RSS Feed' || feed.title === 'Atom Feed') {
+      throw new Error('Impossible d\'extraire le titre du flux RSS - le format pourrait ne pas être supporté');
     }
 
     console.log('Flux RSS analysé:', feed.title, 'avec', feed.items.length, 'articles');
