@@ -22,161 +22,174 @@ interface RSSFeed {
   items: RSSItem[];
 }
 
-// Parser RSS amélioré pour Deno
+// Parser RSS simplifié et plus robuste
 function parseRSS(xml: string): RSSFeed {
-  // Nettoyer le XML d'abord
-  xml = xml.replace(/^\uFEFF/, ''); // Supprimer BOM
-  xml = xml.trim();
-  
-  console.log('Tentative de parsing XML, longueur:', xml.length);
-  console.log('Début du XML:', xml.substring(0, 500));
-  
-  // Vérifier si c'est un flux Atom ou RSS
-  const isAtom = xml.includes('<feed') && (xml.includes('xmlns="http://www.w3.org/2005/Atom"') || xml.includes('xmlns:atom'));
-  const isRDF = xml.includes('<rdf:RDF') || xml.includes('xmlns:rdf');
-  
-  console.log('Type de flux détecté:', { isAtom, isRDF });
-  
-  if (isAtom) {
-    return parseAtomFeed(xml);
-  } else if (isRDF) {
-    return parseRDFFeed(xml);
-  } else {
-    return parseRSSFeed(xml);
+  try {
+    // Nettoyer le XML d'abord
+    xml = xml.replace(/^\uFEFF/, ''); // Supprimer BOM
+    xml = xml.trim();
+    
+    console.log('Tentative de parsing XML, longueur:', xml.length);
+    console.log('Début du XML (premiers 300 caractères):', xml.substring(0, 300));
+    
+    // Vérifier si c'est un flux Atom ou RSS
+    const isAtom = xml.includes('<feed') && xml.includes('xmlns');
+    const isRDF = xml.includes('<rdf:RDF') || xml.includes('xmlns:rdf');
+    
+    console.log('Type de flux détecté:', { isAtom, isRDF });
+    
+    if (isAtom) {
+      return parseAtomFeed(xml);
+    } else if (isRDF) {
+      return parseRDFFeed(xml);
+    } else {
+      return parseRSSFeed(xml);
+    }
+  } catch (error) {
+    console.error('Erreur lors du parsing RSS:', error);
+    throw new Error(`Erreur lors du parsing du flux RSS: ${error.message}`);
   }
 }
 
 function parseRSSFeed(xml: string): RSSFeed {
-  // Extraire le titre et la description du canal
-  const channelTitleMatch = xml.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s);
-  const channelDescMatch = xml.match(/<description[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s);
-  
-  const title = channelTitleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || 'RSS Feed';
-  const description = channelDescMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-  
-  console.log('Titre du flux:', title);
-  console.log('Description du flux:', description);
-  
-  // Extraire les items
-  const items: RSSItem[] = [];
-  const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/g;
-  let itemMatch;
-  let itemCount = 0;
-  
-  while ((itemMatch = itemRegex.exec(xml)) !== null && itemCount < 50) {
-    const itemXml = itemMatch[1];
+  try {
+    // Extraire le titre et la description du canal de manière plus robuste
+    const channelMatch = xml.match(/<channel[^>]*>([\s\S]*?)<\/channel>/i);
+    const channelContent = channelMatch ? channelMatch[1] : xml;
     
-    const itemTitleMatch = itemXml.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s);
-    const itemDescMatch = itemXml.match(/<description[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s);
-    const itemLinkMatch = itemXml.match(/<link[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/link>/s);
-    const itemPubDateMatch = itemXml.match(/<pubDate[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/pubDate>/s);
-    const itemAuthorMatch = itemXml.match(/<(?:author|dc:creator)[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/(?:author|dc:creator)>/s);
+    const titleMatch = channelContent.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/is);
+    const descMatch = channelContent.match(/<description[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/is);
     
-    const itemTitle = itemTitleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemDesc = itemDescMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemLink = itemLinkMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemPubDate = itemPubDateMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemAuthor = itemAuthorMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+    const title = titleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || 'RSS Feed';
+    const description = descMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
     
-    if (itemTitle && itemLink) {
-      items.push({
-        title: itemTitle,
-        description: itemDesc,
-        link: itemLink,
-        pubDate: itemPubDate,
-        author: itemAuthor
-      });
-      itemCount++;
+    console.log('Titre du flux:', title);
+    console.log('Description du flux:', description);
+    
+    // Extraire les items de manière plus simple
+    const items: RSSItem[] = [];
+    const itemMatches = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi);
+    
+    if (itemMatches) {
+      for (let i = 0; i < Math.min(itemMatches.length, 20); i++) {
+        const itemXml = itemMatches[i];
+        
+        const itemTitle = extractTagContent(itemXml, 'title');
+        const itemDesc = extractTagContent(itemXml, 'description');
+        const itemLink = extractTagContent(itemXml, 'link');
+        const itemPubDate = extractTagContent(itemXml, 'pubDate');
+        const itemAuthor = extractTagContent(itemXml, 'author') || extractTagContent(itemXml, 'dc:creator');
+        
+        if (itemTitle && itemLink) {
+          items.push({
+            title: itemTitle,
+            description: itemDesc,
+            link: itemLink,
+            pubDate: itemPubDate,
+            author: itemAuthor
+          });
+        }
+      }
     }
-  }
 
-  console.log(`${items.length} articles extraits`);
-  return { title, description, items };
+    console.log(`${items.length} articles extraits`);
+    return { title, description, items };
+  } catch (error) {
+    console.error('Erreur dans parseRSSFeed:', error);
+    throw error;
+  }
 }
 
 function parseAtomFeed(xml: string): RSSFeed {
-  // Parser pour les flux Atom
-  const titleMatch = xml.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s);
-  const subtitleMatch = xml.match(/<subtitle[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/subtitle>/s);
-  
-  const title = titleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || 'Atom Feed';
-  const description = subtitleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-  
-  const items: RSSItem[] = [];
-  const entryRegex = /<entry[^>]*>([\s\S]*?)<\/entry>/g;
-  let entryMatch;
-  let entryCount = 0;
-  
-  while ((entryMatch = entryRegex.exec(xml)) !== null && entryCount < 50) {
-    const entryXml = entryMatch[1];
+  try {
+    const title = extractTagContent(xml, 'title') || 'Atom Feed';
+    const description = extractTagContent(xml, 'subtitle') || '';
     
-    const entryTitleMatch = entryXml.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s);
-    const entrySummaryMatch = entryXml.match(/<(?:summary|content)[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/(?:summary|content)>/s);
-    const entryLinkMatch = entryXml.match(/<link[^>]*href="([^"]*)"[^>]*>/);
-    const entryUpdatedMatch = entryXml.match(/<(?:updated|published)[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/(?:updated|published)>/s);
-    const entryAuthorMatch = entryXml.match(/<author[^>]*>[\s\S]*?<name[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/name>/s);
+    const items: RSSItem[] = [];
+    const entryMatches = xml.match(/<entry[^>]*>([\s\S]*?)<\/entry>/gi);
     
-    const entryTitle = entryTitleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const entrySummary = entrySummaryMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const entryLink = entryLinkMatch?.[1]?.trim() || '';
-    const entryUpdated = entryUpdatedMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const entryAuthor = entryAuthorMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    
-    if (entryTitle && entryLink) {
-      items.push({
-        title: entryTitle,
-        description: entrySummary,
-        link: entryLink,
-        pubDate: entryUpdated,
-        author: entryAuthor
-      });
-      entryCount++;
+    if (entryMatches) {
+      for (let i = 0; i < Math.min(entryMatches.length, 20); i++) {
+        const entryXml = entryMatches[i];
+        
+        const entryTitle = extractTagContent(entryXml, 'title');
+        const entrySummary = extractTagContent(entryXml, 'summary') || extractTagContent(entryXml, 'content');
+        const linkMatch = entryXml.match(/<link[^>]*href="([^"]*)"[^>]*>/);
+        const entryLink = linkMatch?.[1] || '';
+        const entryUpdated = extractTagContent(entryXml, 'updated') || extractTagContent(entryXml, 'published');
+        const entryAuthor = extractAuthorFromAtom(entryXml);
+        
+        if (entryTitle && entryLink) {
+          items.push({
+            title: entryTitle,
+            description: entrySummary,
+            link: entryLink,
+            pubDate: entryUpdated,
+            author: entryAuthor
+          });
+        }
+      }
     }
-  }
 
-  return { title, description, items };
+    return { title, description, items };
+  } catch (error) {
+    console.error('Erreur dans parseAtomFeed:', error);
+    throw error;
+  }
 }
 
 function parseRDFFeed(xml: string): RSSFeed {
-  // Parser pour les flux RDF/RSS 1.0
-  const channelTitleMatch = xml.match(/<channel[^>]*>[\s\S]*?<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s);
-  const channelDescMatch = xml.match(/<channel[^>]*>[\s\S]*?<description[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s);
-  
-  const title = channelTitleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || 'RDF Feed';
-  const description = channelDescMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-  
-  const items: RSSItem[] = [];
-  const itemRegex = /<item[^>]*rdf:about="([^"]*)"[^>]*>([\s\S]*?)<\/item>/g;
-  let itemMatch;
-  let itemCount = 0;
-  
-  while ((itemMatch = itemRegex.exec(xml)) !== null && itemCount < 50) {
-    const itemLink = itemMatch[1];
-    const itemXml = itemMatch[2];
+  try {
+    const title = extractTagContent(xml, 'title') || 'RDF Feed';
+    const description = extractTagContent(xml, 'description') || '';
     
-    const itemTitleMatch = itemXml.match(/<title[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/s);
-    const itemDescMatch = itemXml.match(/<description[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/description>/s);
-    const itemDateMatch = itemXml.match(/<dc:date[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/dc:date>/s);
-    const itemCreatorMatch = itemXml.match(/<dc:creator[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/dc:creator>/s);
+    const items: RSSItem[] = [];
+    const itemMatches = xml.match(/<item[^>]*>([\s\S]*?)<\/item>/gi);
     
-    const itemTitle = itemTitleMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemDesc = itemDescMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemDate = itemDateMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    const itemCreator = itemCreatorMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
-    
-    if (itemTitle && itemLink) {
-      items.push({
-        title: itemTitle,
-        description: itemDesc,
-        link: itemLink,
-        pubDate: itemDate,
-        author: itemCreator
-      });
-      itemCount++;
+    if (itemMatches) {
+      for (let i = 0; i < Math.min(itemMatches.length, 20); i++) {
+        const itemXml = itemMatches[i];
+        
+        const itemTitle = extractTagContent(itemXml, 'title');
+        const itemDesc = extractTagContent(itemXml, 'description');
+        const itemLink = extractTagContent(itemXml, 'link');
+        const itemDate = extractTagContent(itemXml, 'dc:date');
+        const itemCreator = extractTagContent(itemXml, 'dc:creator');
+        
+        if (itemTitle && itemLink) {
+          items.push({
+            title: itemTitle,
+            description: itemDesc,
+            link: itemLink,
+            pubDate: itemDate,
+            author: itemCreator
+          });
+        }
+      }
     }
-  }
 
-  return { title, description, items };
+    return { title, description, items };
+  } catch (error) {
+    console.error('Erreur dans parseRDFFeed:', error);
+    throw error;
+  }
+}
+
+// Fonction utilitaire pour extraire le contenu d'une balise
+function extractTagContent(xml: string, tagName: string): string {
+  const regex = new RegExp(`<${tagName}[^>]*>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?<\\/${tagName}>`, 'is');
+  const match = xml.match(regex);
+  return match?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+}
+
+// Fonction utilitaire pour extraire l'auteur d'un flux Atom
+function extractAuthorFromAtom(entryXml: string): string {
+  const authorMatch = entryXml.match(/<author[^>]*>([\s\S]*?)<\/author>/i);
+  if (authorMatch) {
+    const nameMatch = authorMatch[1].match(/<name[^>]*>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/name>/i);
+    return nameMatch?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+  }
+  return '';
 }
 
 // Déterminer la catégorie automatiquement
@@ -205,58 +218,41 @@ function detectCategory(title: string, description: string): string {
   return 'Actualités'; // Catégorie par défaut
 }
 
-async function fetchWithRetry(url: string, maxRetries = 3): Promise<Response> {
-  const userAgents = [
-    'Mozilla/5.0 (compatible; RSS-Bot/1.0)',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-    'feedparser-python/6.0.8 +https://pythonhosted.org/feedparser/'
-  ];
-
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      console.log(`Tentative ${i + 1}/${maxRetries} pour ${url}`);
-      
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': userAgents[i % userAgents.length],
-          'Accept': 'application/rss+xml, application/xml, text/xml, application/atom+xml, text/html, */*',
-          'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8',
-          'Accept-Encoding': 'gzip, deflate',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        },
-        redirect: 'follow'
-      });
-
-      console.log(`Réponse reçue: ${response.status} ${response.statusText}`);
-      console.log('Content-Type:', response.headers.get('content-type'));
-
-      if (response.ok) {
-        return response;
-      }
-
-      console.log(`Tentative ${i + 1} échouée avec le statut ${response.status}: ${response.statusText}`);
-      
-      if (response.status === 403 || response.status === 429) {
-        // Attendre un peu plus longtemps pour ces erreurs
-        await new Promise(resolve => setTimeout(resolve, (i + 1) * 2000));
-      } else if (response.status === 404) {
-        throw new Error(`URL non trouvée (404): Vérifiez que l'URL ${url} est correcte et accessible`);
-      } else if (response.status >= 500) {
-        console.log(`Erreur serveur ${response.status}, tentative de retry...`);
-        await new Promise(resolve => setTimeout(resolve, (i + 1) * 1000));
-      } else {
-        throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      console.log(`Erreur lors de la tentative ${i + 1}:`, error.message);
-      if (i === maxRetries - 1) throw error;
-      await new Promise(resolve => setTimeout(resolve, (i + 1) * 1000));
+async function fetchWithTimeout(url: string, timeoutMs = 15000): Promise<Response> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+  
+  try {
+    console.log(`Tentative de récupération: ${url}`);
+    
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RSS-Reader/1.0; +https://example.com)',
+        'Accept': 'application/rss+xml, application/xml, text/xml, application/atom+xml, */*',
+        'Accept-Language': 'en-US,en;q=0.9,fr;q=0.8',
+        'Cache-Control': 'no-cache'
+      },
+      signal: controller.signal,
+      redirect: 'follow'
+    });
+    
+    clearTimeout(timeoutId);
+    
+    console.log(`Réponse reçue: ${response.status} ${response.statusText}`);
+    console.log('Content-Type:', response.headers.get('content-type'));
+    
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
     }
+    
+    return response;
+  } catch (error) {
+    clearTimeout(timeoutId);
+    if (error.name === 'AbortError') {
+      throw new Error('Timeout: La requête a pris trop de temps');
+    }
+    throw error;
   }
-
-  throw new Error('Toutes les tentatives ont échoué');
 }
 
 serve(async (req) => {
@@ -272,35 +268,40 @@ serve(async (req) => {
     }
 
     // Valider l'URL
+    let validUrl: URL;
     try {
-      new URL(url);
+      validUrl = new URL(url);
     } catch {
       throw new Error('URL invalide fournie');
     }
 
+    // Vérifier que l'URL utilise HTTP ou HTTPS
+    if (!['http:', 'https:'].includes(validUrl.protocol)) {
+      throw new Error('Seuls les protocoles HTTP et HTTPS sont autorisés');
+    }
+
     console.log('Récupération du flux RSS:', url);
 
-    // Récupérer le flux RSS avec retry
-    const response = await fetchWithRetry(url);
+    // Récupérer le flux RSS avec timeout
+    const response = await fetchWithTimeout(url);
     const xmlContent = await response.text();
     
     console.log('Contenu récupéré, longueur:', xmlContent.length);
-    console.log('Content-Type de la réponse:', response.headers.get('content-type'));
 
-    if (!xmlContent || xmlContent.length < 100) {
-      throw new Error('Le contenu récupéré semble vide ou trop court pour être un flux RSS valide');
+    if (!xmlContent || xmlContent.length < 50) {
+      throw new Error('Le contenu récupéré semble vide ou trop court');
     }
 
-    // Vérifier si c'est du XML valide
-    if (!xmlContent.includes('<') || (!xmlContent.includes('<rss') && !xmlContent.includes('<feed') && !xmlContent.includes('<rdf:RDF') && !xmlContent.includes('<channel'))) {
-      console.log('Contenu reçu (premiers 500 caractères):', xmlContent.substring(0, 500));
-      throw new Error('Le contenu récupéré ne semble pas être un flux RSS/XML valide');
+    // Vérifier basiquement si c'est du XML
+    if (!xmlContent.includes('<')) {
+      console.log('Contenu reçu (premiers 200 caractères):', xmlContent.substring(0, 200));
+      throw new Error('Le contenu récupéré ne semble pas être du XML valide');
     }
 
     const feed = parseRSS(xmlContent);
 
     if (!feed.title || feed.title === 'RSS Feed' || feed.title === 'Atom Feed' || feed.title === 'RDF Feed') {
-      throw new Error('Impossible d\'extraire le titre du flux RSS - le format pourrait ne pas être supporté');
+      throw new Error('Impossible d\'extraire le titre du flux RSS');
     }
 
     console.log('Flux RSS analysé:', feed.title, 'avec', feed.items.length, 'articles');
@@ -315,13 +316,14 @@ serve(async (req) => {
     const categoryName = detectCategory(feed.title, feed.description);
     
     // Récupérer l'ID de la catégorie
-    const { data: category } = await supabase
+    const { data: category, error: categoryError } = await supabase
       .from('categories')
       .select('id')
       .eq('name', categoryName)
       .single();
 
-    if (!category) {
+    if (categoryError || !category) {
+      console.error('Erreur catégorie:', categoryError);
       throw new Error(`Catégorie "${categoryName}" non trouvée dans la base de données`);
     }
 
@@ -330,7 +332,7 @@ serve(async (req) => {
       .from('rss_feeds')
       .select('id')
       .eq('url', url)
-      .single();
+      .maybeSingle();
 
     if (existingFeed) {
       throw new Error('Ce flux RSS existe déjà dans la base de données');
@@ -358,10 +360,10 @@ serve(async (req) => {
 
     console.log('Flux RSS inséré:', insertedFeed.id);
 
-    // Traiter les articles de manière synchrone pour éviter les timeouts
+    // Traiter les articles (limité pour éviter les timeouts)
     if (feed.items.length > 0) {
-      console.log(`Début du traitement de ${feed.items.length} articles`);
-      await processArticles(feed.items, insertedFeed.id, supabase);
+      console.log(`Début du traitement de ${Math.min(feed.items.length, 10)} articles`);
+      await processArticles(feed.items.slice(0, 10), insertedFeed.id, supabase);
     }
 
     return new Response(JSON.stringify({ 
@@ -374,11 +376,25 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Erreur complète:', error);
+    
+    // Retourner une erreur plus spécifique selon le type d'erreur
+    let errorMessage = error.message || 'Une erreur inconnue s\'est produite';
+    
+    if (errorMessage.includes('Timeout')) {
+      errorMessage = 'Le flux RSS met trop de temps à répondre. Veuillez réessayer plus tard.';
+    } else if (errorMessage.includes('500')) {
+      errorMessage = 'Le serveur du flux RSS a rencontré une erreur. Veuillez vérifier l\'URL ou réessayer plus tard.';
+    } else if (errorMessage.includes('404')) {
+      errorMessage = 'Le flux RSS n\'a pas été trouvé. Veuillez vérifier l\'URL.';
+    } else if (errorMessage.includes('403')) {
+      errorMessage = 'L\'accès au flux RSS est interdit. Le site pourrait bloquer les bots.';
+    }
+    
     return new Response(JSON.stringify({ 
       success: false, 
-      error: error.message || 'Une erreur inconnue s\'est produite'
+      error: errorMessage
     }), {
-      status: 500,
+      status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
@@ -387,7 +403,7 @@ serve(async (req) => {
 async function processArticles(items: RSSItem[], feedId: string, supabase: any) {
   console.log(`Traitement de ${items.length} articles pour le flux ${feedId}`);
   
-  for (const item of items.slice(0, 20)) { // Limiter à 20 articles pour éviter les timeouts
+  for (const item of items) {
     try {
       // Convertir la date de publication
       let publishedAt = null;
@@ -399,22 +415,22 @@ async function processArticles(items: RSSItem[], feedId: string, supabase: any) 
         }
       }
 
-      // Nettoyer le contenu HTML et limiter la taille
+      // Nettoyer le contenu
       const cleanDescription = item.description
-        .replace(/<[^>]*>/g, '') // Supprimer les balises HTML
-        .replace(/&[^;]+;/g, ' ') // Supprimer les entités HTML
+        .replace(/<[^>]*>/g, '')
+        .replace(/&[^;]+;/g, ' ')
         .trim()
-        .substring(0, 1000); // Limiter à 1000 caractères
+        .substring(0, 500);
 
       // Vérifier si l'article existe déjà
       const { data: existingArticle } = await supabase
         .from('articles')
         .select('id')
         .eq('url', item.link)
-        .single();
+        .maybeSingle();
 
       if (existingArticle) {
-        console.log('Article déjà existant, passage au suivant:', item.title.substring(0, 50));
+        console.log('Article déjà existant:', item.title.substring(0, 50));
         continue;
       }
 
@@ -423,13 +439,13 @@ async function processArticles(items: RSSItem[], feedId: string, supabase: any) 
         .from('articles')
         .insert({
           feed_id: feedId,
-          title: item.title.substring(0, 255), // Limiter la taille du titre
-          summary: cleanDescription.length > 500 ? cleanDescription.substring(0, 497) + '...' : cleanDescription,
+          title: item.title.substring(0, 255),
+          summary: cleanDescription,
           content: cleanDescription,
           url: item.link,
           author: item.author ? item.author.substring(0, 100) : null,
           published_at: publishedAt,
-          relevance_score: 0.5 // Score par défaut
+          relevance_score: 0.5
         });
 
       if (error) {
