@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -106,7 +105,7 @@ export function useDeleteRSSFeed() {
 
   return useMutation({
     mutationFn: async (feedId: string) => {
-      console.log('🔴 DÉBUT SUPPRESSION - Feed ID:', feedId);
+      console.log('🔴 DÉBUT SUPPRESSION DIRECTE - Feed ID:', feedId);
       
       try {
         // Étape 1: Vérifier que le feed existe
@@ -124,20 +123,7 @@ export function useDeleteRSSFeed() {
 
         console.log('✅ Feed trouvé:', feedExists);
 
-        // Étape 2: Compter les articles associés
-        console.log('🔢 Comptage des articles associés...');
-        const { count: articleCount, error: countError } = await supabase
-          .from('articles')
-          .select('*', { count: 'exact', head: true })
-          .eq('feed_id', feedId);
-
-        if (countError) {
-          console.error('❌ Erreur lors du comptage:', countError);
-        } else {
-          console.log(`📊 Articles à supprimer: ${articleCount || 0}`);
-        }
-
-        // Étape 3: Supprimer tous les articles du flux
+        // Étape 2: Supprimer tous les articles du flux d'abord (relation)
         console.log('🗑️ Suppression des articles...');
         const { error: articlesError } = await supabase
           .from('articles')
@@ -150,7 +136,7 @@ export function useDeleteRSSFeed() {
         }
         console.log('✅ Articles supprimés avec succès');
 
-        // Étape 4: Supprimer le flux RSS
+        // Étape 3: Supprimer le flux RSS
         console.log('🗑️ Suppression du flux RSS...');
         const { error: feedError } = await supabase
           .from('rss_feeds')
@@ -163,20 +149,7 @@ export function useDeleteRSSFeed() {
         }
         console.log('✅ Flux RSS supprimé avec succès');
 
-        // Étape 5: Vérifier que la suppression a bien eu lieu
-        console.log('🔍 Vérification finale...');
-        const { data: verifyData, error: verifyError } = await supabase
-          .from('rss_feeds')
-          .select('id')
-          .eq('id', feedId);
-
-        if (verifyError) {
-          console.error('❌ Erreur lors de la vérification:', verifyError);
-        } else {
-          console.log('🔍 Résultat vérification:', verifyData?.length === 0 ? 'Feed bien supprimé' : 'Feed encore présent !');
-        }
-
-        console.log('🎉 SUPPRESSION TERMINÉE AVEC SUCCÈS');
+        console.log('🎉 SUPPRESSION RÉUSSIE');
         return { success: true, feedTitle: feedExists.title, feedId };
 
       } catch (error) {
@@ -187,17 +160,14 @@ export function useDeleteRSSFeed() {
     onMutate: async (feedId: string) => {
       console.log('🔄 DÉBUT onMutate - Mise à jour optimiste...');
       
-      // Annuler les requêtes en cours pour éviter les conflits
       await queryClient.cancelQueries({ queryKey: ['rss-feeds'] });
       
-      // Sauvegarder l'état précédent
       const previousFeeds = queryClient.getQueryData(['rss-feeds']);
       
-      // Mise à jour optimiste : retirer le feed de la liste
       queryClient.setQueryData(['rss-feeds'], (old: Feed[] | undefined) => {
         if (!old) return [];
         const filtered = old.filter(feed => feed.id !== feedId);
-        console.log('🎯 Feed retiré du cache, nouvelle liste:', filtered.length, 'feeds');
+        console.log('🎯 Feed retiré du cache optimiste, nouvelle liste:', filtered.length, 'feeds');
         return filtered;
       });
       
@@ -205,22 +175,18 @@ export function useDeleteRSSFeed() {
       return { previousFeeds };
     },
     onSuccess: (data, feedId) => {
-      console.log('🎉 onSuccess - Suppression réussie, mise à jour du cache...');
+      console.log('🎉 onSuccess - Suppression réussie !');
       
-      // Forcer le rechargement des données depuis le serveur
+      // Force le rechargement des données
       queryClient.refetchQueries({ queryKey: ['rss-feeds'] });
-      queryClient.refetchQueries({ queryKey: ['articles'] });
-      
-      // Supprimer les articles liés du cache
       queryClient.removeQueries({ queryKey: ['articles', feedId] });
       
-      console.log('✅ Cache mis à jour et queries invalidées');
+      console.log('✅ Cache mis à jour');
       toast.success(`Flux RSS "${data.feedTitle}" supprimé avec succès !`);
     },
     onError: (error: any, feedId: string, context: any) => {
-      console.error('🚨 onError - Restauration du cache...');
+      console.error('🚨 onError - Suppression échouée, restauration...');
       
-      // Restaurer l'état précédent en cas d'erreur
       if (context?.previousFeeds) {
         queryClient.setQueryData(['rss-feeds'], context.previousFeeds);
       }
@@ -230,7 +196,6 @@ export function useDeleteRSSFeed() {
     },
     onSettled: () => {
       console.log('🏁 onSettled - Nettoyage final...');
-      // Toujours refetch pour s'assurer que les données sont à jour
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
     }
   });
