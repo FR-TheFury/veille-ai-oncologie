@@ -106,45 +106,94 @@ export function useDeleteRSSFeed() {
 
   return useMutation({
     mutationFn: async (feedId: string) => {
-      console.log('Début de la suppression du feed:', feedId);
+      console.log('🔴 DÉBUT SUPPRESSION - Feed ID:', feedId);
       
-      // D'abord supprimer tous les articles du flux
-      console.log('Suppression des articles...');
-      const { error: articlesError } = await supabase
-        .from('articles')
-        .delete()
-        .eq('feed_id', feedId);
+      try {
+        // Étape 1: Vérifier que le feed existe
+        console.log('🔍 Vérification existence du feed...');
+        const { data: feedExists, error: checkError } = await supabase
+          .from('rss_feeds')
+          .select('id, title')
+          .eq('id', feedId)
+          .single();
 
-      if (articlesError) {
-        console.error('Erreur lors de la suppression des articles:', articlesError);
-        throw articlesError;
+        if (checkError) {
+          console.error('❌ Erreur lors de la vérification du feed:', checkError);
+          throw new Error(`Feed introuvable: ${checkError.message}`);
+        }
+
+        console.log('✅ Feed trouvé:', feedExists);
+
+        // Étape 2: Compter les articles associés
+        console.log('🔢 Comptage des articles associés...');
+        const { count: articleCount, error: countError } = await supabase
+          .from('articles')
+          .select('*', { count: 'exact', head: true })
+          .eq('feed_id', feedId);
+
+        if (countError) {
+          console.error('❌ Erreur lors du comptage:', countError);
+        } else {
+          console.log(`📊 Articles à supprimer: ${articleCount || 0}`);
+        }
+
+        // Étape 3: Supprimer tous les articles du flux
+        console.log('🗑️ Suppression des articles...');
+        const { error: articlesError } = await supabase
+          .from('articles')
+          .delete()
+          .eq('feed_id', feedId);
+
+        if (articlesError) {
+          console.error('❌ Erreur lors de la suppression des articles:', articlesError);
+          throw new Error(`Erreur suppression articles: ${articlesError.message}`);
+        }
+        console.log('✅ Articles supprimés avec succès');
+
+        // Étape 4: Supprimer le flux RSS
+        console.log('🗑️ Suppression du flux RSS...');
+        const { error: feedError } = await supabase
+          .from('rss_feeds')
+          .delete()
+          .eq('id', feedId);
+
+        if (feedError) {
+          console.error('❌ Erreur lors de la suppression du flux:', feedError);
+          throw new Error(`Erreur suppression flux: ${feedError.message}`);
+        }
+        console.log('✅ Flux RSS supprimé avec succès');
+
+        // Étape 5: Vérifier que la suppression a bien eu lieu
+        console.log('🔍 Vérification finale...');
+        const { data: verifyData, error: verifyError } = await supabase
+          .from('rss_feeds')
+          .select('id')
+          .eq('id', feedId);
+
+        if (verifyError) {
+          console.error('❌ Erreur lors de la vérification:', verifyError);
+        } else {
+          console.log('🔍 Résultat vérification:', verifyData?.length === 0 ? 'Feed bien supprimé' : 'Feed encore présent !');
+        }
+
+        console.log('🎉 SUPPRESSION TERMINÉE AVEC SUCCÈS');
+        return { success: true, feedTitle: feedExists.title };
+
+      } catch (error) {
+        console.error('💥 ERREUR DANS LA SUPPRESSION:', error);
+        throw error;
       }
-      console.log('Articles supprimés avec succès');
-
-      // Ensuite supprimer le flux
-      console.log('Suppression du flux...');
-      const { error: feedError } = await supabase
-        .from('rss_feeds')
-        .delete()
-        .eq('id', feedId);
-
-      if (feedError) {
-        console.error('Erreur lors de la suppression du flux:', feedError);
-        throw feedError;
-      }
-      console.log('Flux supprimé avec succès');
-
-      return { success: true };
     },
-    onSuccess: () => {
-      console.log('Suppression terminée, invalidation des caches...');
+    onSuccess: (data) => {
+      console.log('🔄 Invalidation des caches...');
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
       queryClient.invalidateQueries({ queryKey: ['articles'] });
-      toast.success('Flux RSS supprimé avec succès !');
+      console.log('✅ Caches invalidés');
+      toast.success(`Flux RSS "${data.feedTitle}" supprimé avec succès !`);
     },
     onError: (error: any) => {
-      console.error('Erreur de suppression:', error);
-      toast.error(error.message || 'Erreur lors de la suppression du flux RSS');
+      console.error('🚨 ERREUR FINALE:', error);
+      toast.error(`Erreur lors de la suppression: ${error.message}`);
     },
   });
 }

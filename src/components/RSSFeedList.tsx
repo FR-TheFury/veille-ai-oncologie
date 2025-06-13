@@ -64,11 +64,15 @@ const RSSFeedList = () => {
     }
   };
 
-  const handleDeleteFeed = async (feedId: string) => {
+  const handleDeleteFeed = async (feedId: string, feedTitle: string) => {
+    console.log('🎯 DÉBUT handleDeleteFeed - Feed ID:', feedId, 'Title:', feedTitle);
+    
     try {
+      console.log('🚀 Appel de la mutation de suppression...');
       await deleteFeedMutation.mutateAsync(feedId);
+      console.log('✅ Mutation de suppression terminée avec succès');
     } catch (error) {
-      console.error('Error deleting feed:', error);
+      console.error('💥 Erreur dans handleDeleteFeed:', error);
     }
   };
 
@@ -261,6 +265,9 @@ const RSSFeedList = () => {
                         variant="outline" 
                         size="sm"
                         className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                        onClick={() => {
+                          console.log('🔴 Bouton supprimer cliqué pour:', feed.title);
+                        }}
                       >
                         <Trash2 className="w-3 h-3 mr-1" />
                         Supprimer
@@ -277,16 +284,24 @@ const RSSFeedList = () => {
                       <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => handleDeleteFeed(feed.id)}
+                          onClick={() => {
+                            console.log('🎯 Bouton confirmer cliqué dans la dialog pour:', feed.title);
+                            handleDeleteFeed(feed.id, feed.title);
+                          }}
                           className="bg-red-600 hover:bg-red-700"
                           disabled={deleteFeedMutation.isPending}
                         >
                           {deleteFeedMutation.isPending ? (
-                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                            <>
+                              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                              Suppression...
+                            </>
                           ) : (
-                            <Trash2 className="w-4 h-4 mr-2" />
+                            <>
+                              <Trash2 className="w-4 h-4 mr-2" />
+                              Supprimer
+                            </>
                           )}
-                          Supprimer
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
