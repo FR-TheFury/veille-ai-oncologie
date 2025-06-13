@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Rss, ExternalLink, Calendar, Plus, Trash2, Eye, ArrowRight, Filter, RefreshCw } from 'lucide-react';
+import { Rss, ExternalLink, Calendar, Plus, Trash2, Eye, ArrowRight, Filter, RefreshCw, Shield, Lock } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import FeedDetail from './FeedDetail';
 import { useRSSFeeds, useAddRSSFeed, useFetchArticles, useDeleteRSSFeed } from '@/hooks/useRSSFeeds';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +23,8 @@ import {
 
 const RSSFeedList = () => {
   const { t } = useTranslation();
+  const { user, isAdmin, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>(t('rss.categories.all'));
@@ -41,6 +45,15 @@ const RSSFeedList = () => {
   const selectedFeed = feeds.find(feed => feed.id === selectedFeedId);
 
   const handleAddFeed = async () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
+    if (!isAdmin()) {
+      return;
+    }
+    
     if (!newFeedUrl.trim()) return;
     
     try {
@@ -58,6 +71,15 @@ const RSSFeedList = () => {
   };
 
   const handleRefreshFeed = async (feedId: string) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
+    if (!isAdmin()) {
+      return;
+    }
+    
     try {
       await fetchArticlesMutation.mutateAsync(feedId);
     } catch (error) {
@@ -66,6 +88,15 @@ const RSSFeedList = () => {
   };
 
   const handleDeleteFeed = async (feedId: string, feedTitle: string) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    
+    if (!isAdmin()) {
+      return;
+    }
+    
     console.log('🎯 DÉBUT handleDeleteFeed - Feed ID:', feedId, 'Title:', feedTitle);
     
     setDeletingFeedId(feedId);
@@ -85,7 +116,7 @@ const RSSFeedList = () => {
     return <FeedDetail feed={selectedFeed} onBack={() => setSelectedFeedId(null)} />;
   }
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -111,27 +142,66 @@ const RSSFeedList = () => {
             {/* Force l'affichage du count en utilisant replace pour debug */}
             {t('rss.subtitle').replace('{count}', feeds.length.toString())}
           </p>
+          {user && (
+            <div className="flex items-center mt-2 space-x-2">
+              <Badge variant={isAdmin() ? "default" : "secondary"} className="text-xs">
+                {isAdmin() ? (
+                  <>
+                    <Shield className="w-3 h-3 mr-1" />
+                    Administrateur
+                  </>
+                ) : (
+                  <>
+                    <Eye className="w-3 h-3 mr-1" />
+                    Lecteur
+                  </>
+                )}
+              </Badge>
+              {!isAdmin() && (
+                <p className="text-xs text-muted-foreground">
+                  Vous êtes en mode lecture seule
+                </p>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex space-x-2">
-          <Input
-            placeholder={t('rss.addPlaceholder')}
-            value={newFeedUrl}
-            onChange={(e) => setNewFeedUrl(e.target.value)}
-            className="w-64 bg-background/50 backdrop-blur-sm"
-            onKeyPress={(e) => e.key === 'Enter' && handleAddFeed()}
-          />
-          <Button 
-            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-            onClick={handleAddFeed}
-            disabled={addFeedMutation.isPending || !newFeedUrl.trim()}
-          >
-            {addFeedMutation.isPending ? (
-              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-            ) : (
-              <Plus className="w-4 h-4 mr-2" />
-            )}
-            {t('rss.addFeed')}
-          </Button>
+          {user && isAdmin() ? (
+            <>
+              <Input
+                placeholder={t('rss.addPlaceholder')}
+                value={newFeedUrl}
+                onChange={(e) => setNewFeedUrl(e.target.value)}
+                className="w-64 bg-background/50 backdrop-blur-sm"
+                onKeyPress={(e) => e.key === 'Enter' && handleAddFeed()}
+              />
+              <Button 
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                onClick={handleAddFeed}
+                disabled={addFeedMutation.isPending || !newFeedUrl.trim()}
+              >
+                {addFeedMutation.isPending ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Plus className="w-4 h-4 mr-2" />
+                )}
+                {t('rss.addFeed')}
+              </Button>
+            </>
+          ) : !user ? (
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Se connecter pour gérer
+            </Button>
+          ) : (
+            <div className="text-sm text-muted-foreground bg-gray-50 px-3 py-2 rounded border">
+              <Lock className="w-4 h-4 inline mr-1" />
+              Seuls les admins peuvent ajouter des flux
+            </div>
+          )}
         </div>
       </div>
 
@@ -212,6 +282,7 @@ const RSSFeedList = () => {
       <div className="grid gap-6">
         {filteredFeeds.map((feed) => {
           const isDeleting = deletingFeedId === feed.id;
+          const canModify = user && isAdmin();
           
           return (
             <Card 
@@ -243,16 +314,18 @@ const RSSFeedList = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleRefreshFeed(feed.id)}
-                      disabled={fetchArticlesMutation.isPending || isDeleting}
-                      className="hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
-                    >
-                      <RefreshCw className={`w-3 h-3 mr-1 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
-                      {t('rss.actions.update')}
-                    </Button>
+                    {canModify && (
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleRefreshFeed(feed.id)}
+                        disabled={fetchArticlesMutation.isPending || isDeleting}
+                        className="hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
+                      >
+                        <RefreshCw className={`w-3 h-3 mr-1 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
+                        {t('rss.actions.update')}
+                      </Button>
+                    )}
                     <Button 
                       variant="outline" 
                       size="sm"
@@ -273,54 +346,56 @@ const RSSFeedList = () => {
                       <ExternalLink className="w-3 h-3 mr-1" />
                       {t('rss.actions.view')}
                     </Button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          disabled={isDeleting}
-                          className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
-                          onClick={() => {
-                            console.log('🔴 Bouton supprimer cliqué pour:', feed.title);
-                          }}
-                        >
-                          <Trash2 className="w-3 h-3 mr-1" />
-                          Supprimer
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Êtes-vous sûr de vouloir supprimer le flux RSS "{feed.title}" ? 
-                            Cette action supprimera également tous les articles associés et ne peut pas être annulée.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Annuler</AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => {
-                              console.log('🎯 Bouton confirmer cliqué dans la dialog pour:', feed.title);
-                              handleDeleteFeed(feed.id, feed.title);
-                            }}
-                            className="bg-red-600 hover:bg-red-700"
+                    {canModify && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button 
+                            variant="outline" 
+                            size="sm"
                             disabled={isDeleting}
+                            className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                            onClick={() => {
+                              console.log('🔴 Bouton supprimer cliqué pour:', feed.title);
+                            }}
                           >
-                            {isDeleting ? (
-                              <>
-                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                                Suppression...
-                              </>
-                            ) : (
-                              <>
-                                <Trash2 className="w-4 h-4 mr-2" />
-                                Supprimer
-                              </>
-                            )}
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                            <Trash2 className="w-3 h-3 mr-1" />
+                            Supprimer
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Êtes-vous sûr de vouloir supprimer le flux RSS "{feed.title}" ? 
+                              Cette action supprimera également tous les articles associés et ne peut pas être annulée.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => {
+                                console.log('🎯 Bouton confirmer cliqué dans la dialog pour:', feed.title);
+                                handleDeleteFeed(feed.id, feed.title);
+                              }}
+                              className="bg-red-600 hover:bg-red-700"
+                              disabled={isDeleting}
+                            >
+                              {isDeleting ? (
+                                <>
+                                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                  Suppression...
+                                </>
+                              ) : (
+                                <>
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  Supprimer
+                                </>
+                              )}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
                   </div>
                 </div>
               </CardHeader>
@@ -360,6 +435,15 @@ const RSSFeedList = () => {
           <Rss className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
           <h3 className="text-lg font-semibold mb-2">{t('rss.noFeeds')}</h3>
           <p className="text-muted-foreground mb-4">{t('rss.noFeedsSubtitle')}</p>
+          {!user && (
+            <Button 
+              onClick={() => navigate('/auth')}
+              className="bg-gradient-to-r from-blue-600 to-purple-600"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Se connecter pour ajouter des flux
+            </Button>
+          )}
         </div>
       )}
     </div>

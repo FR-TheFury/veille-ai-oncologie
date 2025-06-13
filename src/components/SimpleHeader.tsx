@@ -1,14 +1,17 @@
 
-import { Info, Rss, Globe } from 'lucide-react';
+import { Info, Rss, Globe, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/contexts/AuthContext';
 import LanguageSelector from './LanguageSelector';
+import UserMenu from './UserMenu';
 
 const SimpleHeader = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { user, loading } = useAuth();
 
   return (
     <header className="bg-white shadow-sm border-b">
@@ -44,6 +47,22 @@ const SimpleHeader = () => {
               {t('header.about')}
             </Button>
             <LanguageSelector />
+            
+            {!loading && (
+              user ? (
+                <UserMenu />
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => navigate('/auth')}
+                  className="hover:bg-blue-50 hover:border-blue-300"
+                >
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Connexion
+                </Button>
+              )
+            )}
           </nav>
         </div>
       </div>
