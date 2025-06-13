@@ -100,6 +100,38 @@ export function useAddRSSFeed() {
   });
 }
 
+export function useDeleteRSSFeed() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (feedId: string) => {
+      // First delete all articles for this feed
+      const { error: articlesError } = await supabase
+        .from('articles')
+        .delete()
+        .eq('feed_id', feedId);
+
+      if (articlesError) throw articlesError;
+
+      // Then delete the feed
+      const { error: feedError } = await supabase
+        .from('rss_feeds')
+        .delete()
+        .eq('id', feedId);
+
+      if (feedError) throw feedError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
+      queryClient.invalidateQueries({ queryKey: ['articles'] });
+      toast.success('Flux RSS supprimé avec succès !');
+    },
+    onError: (error: any) => {
+      toast.error(error.message || 'Erreur lors de la suppression du flux RSS');
+    },
+  });
+}
+
 export function useFetchArticles() {
   const queryClient = useQueryClient();
 

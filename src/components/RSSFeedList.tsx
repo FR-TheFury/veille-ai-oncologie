@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Rss, ExternalLink, Calendar, Plus, Trash2, Eye, ArrowRight, Filter, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,8 +5,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import FeedDetail from './FeedDetail';
-import { useRSSFeeds, useAddRSSFeed, useFetchArticles } from '@/hooks/useRSSFeeds';
+import { useRSSFeeds, useAddRSSFeed, useFetchArticles, useDeleteRSSFeed } from '@/hooks/useRSSFeeds';
 import { useTranslation } from 'react-i18next';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 const RSSFeedList = () => {
   const { t } = useTranslation();
@@ -18,6 +28,7 @@ const RSSFeedList = () => {
   const { data: feeds = [], isLoading } = useRSSFeeds();
   const addFeedMutation = useAddRSSFeed();
   const fetchArticlesMutation = useFetchArticles();
+  const deleteFeedMutation = useDeleteRSSFeed();
 
   // Extract unique categories from feeds
   const categories = [t('rss.categories.all'), ...Array.from(new Set(feeds.map(feed => feed.categories?.name).filter(Boolean)))];
@@ -50,6 +61,14 @@ const RSSFeedList = () => {
       await fetchArticlesMutation.mutateAsync(feedId);
     } catch (error) {
       console.error('Error updating feed:', error);
+    }
+  };
+
+  const handleDeleteFeed = async (feedId: string) => {
+    try {
+      await deleteFeedMutation.mutateAsync(feedId);
+    } catch (error) {
+      console.error('Error deleting feed:', error);
     }
   };
 
@@ -236,6 +255,42 @@ const RSSFeedList = () => {
                     <ExternalLink className="w-3 h-3 mr-1" />
                     {t('rss.actions.view')}
                   </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Supprimer
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Êtes-vous sûr de vouloir supprimer le flux RSS "{feed.title}" ? 
+                          Cette action supprimera également tous les articles associés et ne peut pas être annulée.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDeleteFeed(feed.id)}
+                          className="bg-red-600 hover:bg-red-700"
+                          disabled={deleteFeedMutation.isPending}
+                        >
+                          {deleteFeedMutation.isPending ? (
+                            <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-4 h-4 mr-2" />
+                          )}
+                          Supprimer
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </CardHeader>
