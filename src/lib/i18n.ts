@@ -26,7 +26,7 @@ i18n
     
     interpolation: {
       escapeValue: false,
-      // Ensure interpolation works correctly
+      // Support pour les variables avec format personnalisé
       format: function(value, format, lng) {
         if (format === 'number') return new Intl.NumberFormat(lng).format(value);
         return value;
@@ -39,11 +39,13 @@ i18n
       lookupLocalStorage: 'i18nextLng',
     },
 
-    // Enable debug mode to see interpolation issues
-    debug: false,
+    // Activer le mode debug temporairement pour voir les problèmes d'interpolation
+    debug: true,
     
-    // Ensure variables are properly processed
+    // S'assurer que les variables sont correctement traitées
     returnObjects: false,
+    returnNull: false,
+    returnEmptyString: false,
   });
 
 export default i18n;

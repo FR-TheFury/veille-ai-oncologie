@@ -67,6 +67,51 @@ Réponds au format JSON:
   }
 }
 
+// Fonction utilitaire pour extraire le contenu d'une balise
+function extractTagContent(xml: string, tagName: string): string {
+  const regex = new RegExp(`<${tagName}[^>]*>(?:<!\\[CDATA\\[)?(.*?)(?:\\]\\]>)?<\\/${tagName}>`, 'is');
+  const match = xml.match(regex);
+  return match?.[1]?.replace(/<[^>]*>/g, '').trim() || '';
+}
+
+// Parser RSS simplifié sans DOMParser
+function parseRSSItems(xmlContent: string): Array<{title: string, description: string, link: string, pubDate: string, author: string}> {
+  const items: Array<{title: string, description: string, link: string, pubDate: string, author: string}> = [];
+  
+  try {
+    // Extraire les items
+    const itemMatches = xmlContent.match(/<item[^>]*>([\s\S]*?)<\/item>/gi);
+    
+    if (itemMatches) {
+      for (let i = 0; i < Math.min(itemMatches.length, 20); i++) {
+        const itemXml = itemMatches[i];
+        
+        const title = extractTagContent(itemXml, 'title');
+        const description = extractTagContent(itemXml, 'description');
+        const link = extractTagContent(itemXml, 'link');
+        const pubDate = extractTagContent(itemXml, 'pubDate');
+        const author = extractTagContent(itemXml, 'author') || extractTagContent(itemXml, 'dc:creator');
+        
+        if (title && link) {
+          items.push({
+            title,
+            description,
+            link,
+            pubDate,
+            author
+          });
+        }
+      }
+    }
+    
+    console.log(`${items.length} articles extraits du flux RSS`);
+    return items;
+  } catch (error) {
+    console.error('Erreur lors du parsing RSS:', error);
+    return [];
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -93,56 +138,65 @@ serve(async (req) => {
 
     console.log('Mise à jour du flux:', feed.title);
 
-    // Récupérer le flux RSS
-    const response = await fetch(feed.url);
-    const xmlContent = await response.text();
+    // Récupérer le flux RSS avec headers appropriés
+    const response = await fetch(feed.url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; RSS-Reader/1.0)',
+        'Accept': 'application/rss+xml, application/xml, text/xml, application/atom+xml, */*',
+      }
+    });
     
-    // Parser le RSS (réutiliser la fonction du premier edge function)
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(xmlContent, 'text/xml');
-    const items = doc.querySelectorAll('item');
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP ${response.status}: ${response.statusText}`);
+    }
+    
+    const xmlContent = await response.text();
+    console.log('Contenu RSS récupéré, longueur:', xmlContent.length);
+    
+    // Parser le RSS sans DOMParser
+    const items = parseRSSItems(xmlContent);
 
     let processedCount = 0;
 
     for (const item of items) {
-      const title = item.querySelector('title')?.textContent || '';
-      const description = item.querySelector('description')?.textContent || '';
-      const link = item.querySelector('link')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const author = item.querySelector('author, dc\\:creator')?.textContent || '';
-
-      if (!title || !link) continue;
+      if (!item.title || !item.link) continue;
 
       // Vérifier si l'article existe déjà
       const { data: existingArticle } = await supabase
         .from('articles')
         .select('id')
         .eq('feed_id', feedId)
-        .eq('url', link)
-        .single();
+        .eq('url', item.link)
+        .maybeSingle();
 
-      if (existingArticle) continue;
+      if (existingArticle) {
+        console.log('Article déjà existant:', item.title.substring(0, 50));
+        continue;
+      }
 
       // Générer résumé et score avec IA
-      const aiResult = await generateSummaryAndScore(title, description);
+      const aiResult = await generateSummaryAndScore(item.title, item.description);
 
       // Insérer le nouvel article
       const { error } = await supabase
         .from('articles')
         .insert({
           feed_id: feedId,
-          title: title,
+          title: item.title.substring(0, 255),
           summary: aiResult.summary,
-          content: description,
-          url: link,
-          author: author,
-          published_at: pubDate ? new Date(pubDate).toISOString() : null,
+          content: item.description,
+          url: item.link,
+          author: item.author ? item.author.substring(0, 100) : null,
+          published_at: item.pubDate ? new Date(item.pubDate).toISOString() : null,
           relevance_score: aiResult.score,
           keywords: aiResult.keywords
         });
 
       if (!error) {
         processedCount++;
+        console.log('Nouvel article ajouté:', item.title.substring(0, 50));
+      } else {
+        console.error('Erreur insertion article:', error);
       }
     }
 
@@ -155,6 +209,8 @@ serve(async (req) => {
       })
       .eq('id', feedId);
 
+    console.log(`Flux mis à jour: ${processedCount} nouveaux articles`);
+
     return new Response(JSON.stringify({ 
       success: true, 
       processedCount,
@@ -164,7 +220,7 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error('Erreur dans fetch-articles:', error);
     return new Response(JSON.stringify({ 
       success: false, 
       error: error.message 

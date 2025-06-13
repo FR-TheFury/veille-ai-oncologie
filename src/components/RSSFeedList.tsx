@@ -70,6 +70,7 @@ const RSSFeedList = () => {
 
   // Debug log to check feeds count
   console.log('Current feeds count:', feeds.length);
+  console.log('Translation key test:', t('rss.subtitle', { count: feeds.length }));
 
   return (
     <div className="space-y-6">
@@ -79,7 +80,8 @@ const RSSFeedList = () => {
             {t('rss.title')}
           </h2>
           <p className="text-muted-foreground mt-1">
-            {t('rss.subtitle', { count: feeds.length })}
+            {/* Force l'affichage du count en utilisant replace pour debug */}
+            {t('rss.subtitle').replace('{count}', feeds.length.toString())}
           </p>
         </div>
         <div className="flex space-x-2">
@@ -242,14 +244,13 @@ const RSSFeedList = () => {
                 <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                   <span className="flex items-center">
                     <Calendar className="w-3 h-3 mr-1" />
-                    {t('rss.status.lastUpdated', { 
-                      date: feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')
-                    })}
+                    {/* Force l'affichage de la date */}
+                    Mis à jour: {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')}
                   </span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
-                    {t('rss.status.articlesCount', { count: feed.article_count || 0 })}
+                    {feed.article_count || 0} articles
                   </Badge>
                   <Button 
                     variant="ghost" 
