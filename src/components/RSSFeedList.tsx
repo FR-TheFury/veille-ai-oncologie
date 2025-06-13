@@ -32,10 +32,16 @@ const RSSFeedList = () => {
     if (!newFeedUrl.trim()) return;
     
     try {
+      console.log('Attempting to add RSS feed:', newFeedUrl.trim());
       await addFeedMutation.mutateAsync(newFeedUrl.trim());
       setNewFeedUrl('');
     } catch (error) {
       console.error('Error adding feed:', error);
+      // Log the full error for debugging
+      if (error instanceof Error) {
+        console.error('Error message:', error.message);
+        console.error('Error stack:', error.stack);
+      }
     }
   };
 
@@ -61,6 +67,9 @@ const RSSFeedList = () => {
       </div>
     );
   }
+
+  // Debug log to check feeds count
+  console.log('Current feeds count:', feeds.length);
 
   return (
     <div className="space-y-6">
@@ -95,6 +104,18 @@ const RSSFeedList = () => {
           </Button>
         </div>
       </div>
+
+      {/* Display error message if add feed fails */}
+      {addFeedMutation.isError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <p className="font-medium">Erreur lors de l'ajout du flux RSS :</p>
+          <p className="text-sm mt-1">
+            {addFeedMutation.error instanceof Error 
+              ? addFeedMutation.error.message 
+              : 'Une erreur inconnue s\'est produite'}
+          </p>
+        </div>
+      )}
 
       {/* Category filters */}
       <div className="flex items-center space-x-3">

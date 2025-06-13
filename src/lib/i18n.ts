@@ -26,6 +26,11 @@ i18n
     
     interpolation: {
       escapeValue: false,
+      // Ensure interpolation works correctly
+      format: function(value, format, lng) {
+        if (format === 'number') return new Intl.NumberFormat(lng).format(value);
+        return value;
+      }
     },
     
     detection: {
@@ -33,6 +38,12 @@ i18n
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
     },
+
+    // Enable debug mode to see interpolation issues
+    debug: false,
+    
+    // Ensure variables are properly processed
+    returnObjects: false,
   });
 
 export default i18n;
