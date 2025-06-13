@@ -24,6 +24,7 @@ const RSSFeedList = () => {
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>(t('rss.categories.all'));
+  const [deletingFeedId, setDeletingFeedId] = useState<string | null>(null);
 
   const { data: feeds = [], isLoading } = useRSSFeeds();
   const addFeedMutation = useAddRSSFeed();
@@ -67,12 +68,16 @@ const RSSFeedList = () => {
   const handleDeleteFeed = async (feedId: string, feedTitle: string) => {
     console.log('🎯 DÉBUT handleDeleteFeed - Feed ID:', feedId, 'Title:', feedTitle);
     
+    setDeletingFeedId(feedId);
+    
     try {
       console.log('🚀 Appel de la mutation de suppression...');
       await deleteFeedMutation.mutateAsync(feedId);
       console.log('✅ Mutation de suppression terminée avec succès');
     } catch (error) {
       console.error('💥 Erreur dans handleDeleteFeed:', error);
+    } finally {
+      setDeletingFeedId(null);
     }
   };
 
@@ -205,137 +210,149 @@ const RSSFeedList = () => {
       </div>
 
       <div className="grid gap-6">
-        {filteredFeeds.map((feed) => (
-          <Card key={feed.id} className="group hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-transparent hover:border-l-blue-500">
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className={`p-3 rounded-xl shadow-lg`} style={{ backgroundColor: feed.categories?.color || '#3B82F6' }}>
-                    <Rss className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <CardTitle className="text-xl text-foreground group-hover:text-blue-600 transition-colors">
-                        {feed.title}
-                      </CardTitle>
-                      <Badge variant="secondary" className="text-xs">
-                        {feed.categories?.name || t('rss.status.uncategorized')}
-                      </Badge>
-                      {feed.status === 'error' && (
-                        <Badge variant="destructive" className="text-xs">
-                          {t('rss.status.error')}
-                        </Badge>
-                      )}
+        {filteredFeeds.map((feed) => {
+          const isDeleting = deletingFeedId === feed.id;
+          
+          return (
+            <Card 
+              key={feed.id} 
+              className={`group hover:shadow-lg transition-all duration-300 hover:scale-[1.02] border-l-4 border-l-transparent hover:border-l-blue-500 ${isDeleting ? 'opacity-50' : ''}`}
+            >
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className={`p-3 rounded-xl shadow-lg`} style={{ backgroundColor: feed.categories?.color || '#3B82F6' }}>
+                      <Rss className="w-6 h-6 text-white" />
                     </div>
-                    <p className="text-sm text-muted-foreground">{feed.description}</p>
+                    <div className="flex-1">
+                      <div className="flex items-center space-x-3 mb-2">
+                        <CardTitle className="text-xl text-foreground group-hover:text-blue-600 transition-colors">
+                          {feed.title}
+                          {isDeleting && <span className="text-sm text-red-500 ml-2">(Suppression en cours...)</span>}
+                        </CardTitle>
+                        <Badge variant="secondary" className="text-xs">
+                          {feed.categories?.name || t('rss.status.uncategorized')}
+                        </Badge>
+                        {feed.status === 'error' && (
+                          <Badge variant="destructive" className="text-xs">
+                            {t('rss.status.error')}
+                          </Badge>
+                        )}
+                      </div>
+                      <p className="text-sm text-muted-foreground">{feed.description}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleRefreshFeed(feed.id)}
+                      disabled={fetchArticlesMutation.isPending || isDeleting}
+                      className="hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
+                    >
+                      <RefreshCw className={`w-3 h-3 mr-1 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
+                      {t('rss.actions.update')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => setSelectedFeedId(feed.id)}
+                      disabled={isDeleting}
+                      className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
+                    >
+                      <Eye className="w-3 h-3 mr-1" />
+                      {t('rss.actions.details')}
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => window.open(feed.url, '_blank')}
+                      disabled={isDeleting}
+                      className="hover:bg-green-50 hover:border-green-300 hover:text-green-700"
+                    >
+                      <ExternalLink className="w-3 h-3 mr-1" />
+                      {t('rss.actions.view')}
+                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          disabled={isDeleting}
+                          className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
+                          onClick={() => {
+                            console.log('🔴 Bouton supprimer cliqué pour:', feed.title);
+                          }}
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Supprimer
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Êtes-vous sûr de vouloir supprimer le flux RSS "{feed.title}" ? 
+                            Cette action supprimera également tous les articles associés et ne peut pas être annulée.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Annuler</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => {
+                              console.log('🎯 Bouton confirmer cliqué dans la dialog pour:', feed.title);
+                              handleDeleteFeed(feed.id, feed.title);
+                            }}
+                            className="bg-red-600 hover:bg-red-700"
+                            disabled={isDeleting}
+                          >
+                            {isDeleting ? (
+                              <>
+                                <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                                Suppression...
+                              </>
+                            ) : (
+                              <>
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Supprimer
+                              </>
+                            )}
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => handleRefreshFeed(feed.id)}
-                    disabled={fetchArticlesMutation.isPending}
-                    className="hover:bg-yellow-50 hover:border-yellow-300 hover:text-yellow-700"
-                  >
-                    <RefreshCw className={`w-3 h-3 mr-1 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
-                    {t('rss.actions.update')}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSelectedFeedId(feed.id)}
-                    className="hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700"
-                  >
-                    <Eye className="w-3 h-3 mr-1" />
-                    {t('rss.actions.details')}
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => window.open(feed.url, '_blank')}
-                    className="hover:bg-green-50 hover:border-green-300 hover:text-green-700"
-                  >
-                    <ExternalLink className="w-3 h-3 mr-1" />
-                    {t('rss.actions.view')}
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="hover:bg-red-50 hover:border-red-300 hover:text-red-700"
-                        onClick={() => {
-                          console.log('🔴 Bouton supprimer cliqué pour:', feed.title);
-                        }}
-                      >
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Supprimer
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Êtes-vous sûr de vouloir supprimer le flux RSS "{feed.title}" ? 
-                          Cette action supprimera également tous les articles associés et ne peut pas être annulée.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction
-                          onClick={() => {
-                            console.log('🎯 Bouton confirmer cliqué dans la dialog pour:', feed.title);
-                            handleDeleteFeed(feed.id, feed.title);
-                          }}
-                          className="bg-red-600 hover:bg-red-700"
-                          disabled={deleteFeedMutation.isPending}
-                        >
-                          {deleteFeedMutation.isPending ? (
-                            <>
-                              <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                              Suppression...
-                            </>
-                          ) : (
-                            <>
-                              <Trash2 className="w-4 h-4 mr-2" />
-                              Supprimer
-                            </>
-                          )}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4 text-sm text-muted-foreground">
+                    <span className="flex items-center">
+                      <Calendar className="w-3 h-3 mr-1" />
+                      {/* Force l'affichage de la date */}
+                      Mis à jour: {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')}
+                    </span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
+                      {feed.article_count || 0} articles
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => setSelectedFeedId(feed.id)}
+                      disabled={isDeleting}
+                      className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    >
+                      {t('rss.actions.viewArticles')}
+                      <ArrowRight className="w-3 h-3 ml-1" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                  <span className="flex items-center">
-                    <Calendar className="w-3 h-3 mr-1" />
-                    {/* Force l'affichage de la date */}
-                    Mis à jour: {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Badge className="bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 border-blue-200">
-                    {feed.article_count || 0} articles
-                  </Badge>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => setSelectedFeedId(feed.id)}
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                  >
-                    {t('rss.actions.viewArticles')}
-                    <ArrowRight className="w-3 h-3 ml-1" />
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       {feeds.length === 0 && (

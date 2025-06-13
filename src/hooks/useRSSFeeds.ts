@@ -177,24 +177,62 @@ export function useDeleteRSSFeed() {
         }
 
         console.log('🎉 SUPPRESSION TERMINÉE AVEC SUCCÈS');
-        return { success: true, feedTitle: feedExists.title };
+        return { success: true, feedTitle: feedExists.title, feedId };
 
       } catch (error) {
         console.error('💥 ERREUR DANS LA SUPPRESSION:', error);
         throw error;
       }
     },
-    onSuccess: (data) => {
-      console.log('🔄 Invalidation des caches...');
-      queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
-      queryClient.invalidateQueries({ queryKey: ['articles'] });
-      console.log('✅ Caches invalidés');
+    onMutate: async (feedId: string) => {
+      console.log('🔄 DÉBUT onMutate - Mise à jour optimiste...');
+      
+      // Annuler les requêtes en cours pour éviter les conflits
+      await queryClient.cancelQueries({ queryKey: ['rss-feeds'] });
+      
+      // Sauvegarder l'état précédent
+      const previousFeeds = queryClient.getQueryData(['rss-feeds']);
+      
+      // Mise à jour optimiste : retirer le feed de la liste
+      queryClient.setQueryData(['rss-feeds'], (old: Feed[] | undefined) => {
+        if (!old) return [];
+        const filtered = old.filter(feed => feed.id !== feedId);
+        console.log('🎯 Feed retiré du cache, nouvelle liste:', filtered.length, 'feeds');
+        return filtered;
+      });
+      
+      console.log('✅ Mise à jour optimiste terminée');
+      return { previousFeeds };
+    },
+    onSuccess: (data, feedId) => {
+      console.log('🎉 onSuccess - Suppression réussie, mise à jour du cache...');
+      
+      // Forcer le rechargement des données depuis le serveur
+      queryClient.refetchQueries({ queryKey: ['rss-feeds'] });
+      queryClient.refetchQueries({ queryKey: ['articles'] });
+      
+      // Supprimer les articles liés du cache
+      queryClient.removeQueries({ queryKey: ['articles', feedId] });
+      
+      console.log('✅ Cache mis à jour et queries invalidées');
       toast.success(`Flux RSS "${data.feedTitle}" supprimé avec succès !`);
     },
-    onError: (error: any) => {
+    onError: (error: any, feedId: string, context: any) => {
+      console.error('🚨 onError - Restauration du cache...');
+      
+      // Restaurer l'état précédent en cas d'erreur
+      if (context?.previousFeeds) {
+        queryClient.setQueryData(['rss-feeds'], context.previousFeeds);
+      }
+      
       console.error('🚨 ERREUR FINALE:', error);
       toast.error(`Erreur lors de la suppression: ${error.message}`);
     },
+    onSettled: () => {
+      console.log('🏁 onSettled - Nettoyage final...');
+      // Toujours refetch pour s'assurer que les données sont à jour
+      queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
+    }
   });
 }
 
