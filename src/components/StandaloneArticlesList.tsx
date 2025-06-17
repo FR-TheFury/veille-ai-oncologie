@@ -44,6 +44,8 @@ export function StandaloneArticlesList() {
       feed_id: '', // Add feed_id as empty string for standalone articles
       summary: selectedArticle.summary || '', // Ensure summary is always a string
       content: selectedArticle.content || '', // Ensure content is always a string
+      author: selectedArticle.author || '', // Ensure author is always a string
+      published_at: selectedArticle.published_at || selectedArticle.created_at, // Ensure published_at is always defined
       key_points: [], // StandaloneArticle doesn't have key_points
     };
     
