@@ -1,6 +1,6 @@
 
 import SimpleHeader from '@/components/SimpleHeader';
-import RSSFeedList from '@/components/RSSFeedList';
+import { RSSFeedList } from '@/components/RSSFeedList';
 
 const Index = () => {
   return (
