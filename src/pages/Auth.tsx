@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { Globe, Mail, Lock, User, UserPlus } from 'lucide-react';
 import { useEffect } from 'react';
+import PasswordResetDialog from '@/components/PasswordResetDialog';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -145,6 +146,9 @@ const Auth = () => {
                     {isLoading ? 'Connexion...' : 'Se connecter'}
                   </Button>
                 </form>
+                <div className="mt-4 text-center">
+                  <PasswordResetDialog />
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

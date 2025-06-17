@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Rss, ExternalLink, Calendar, Plus, Trash2, Eye, ArrowRight, Filter, RefreshCw, Shield, Lock } from 'lucide-react';
+import { Rss, ExternalLink, Calendar, Plus, Trash2, Eye, ArrowRight, Filter, RefreshCw, Shield, Lock, Settings } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,7 +24,7 @@ import {
 
 const RSSFeedList = () => {
   const { t } = useTranslation();
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [selectedFeedId, setSelectedFeedId] = useState<string | null>(null);
@@ -34,6 +35,11 @@ const RSSFeedList = () => {
   const addFeedMutation = useAddRSSFeed();
   const fetchArticlesMutation = useFetchArticles();
   const deleteFeedMutation = useDeleteRSSFeed();
+
+  // Check if user can manage feeds (admin or manager)
+  const canManageFeeds = () => {
+    return user && profile && (profile.role === 'admin' || profile.role === 'manager');
+  };
 
   // Extract unique categories from feeds
   const categories = [t('rss.categories.all'), ...Array.from(new Set(feeds.map(feed => feed.categories?.name).filter(Boolean)))];
@@ -50,7 +56,7 @@ const RSSFeedList = () => {
       return;
     }
     
-    if (!isAdmin()) {
+    if (!canManageFeeds()) {
       return;
     }
     
@@ -62,7 +68,6 @@ const RSSFeedList = () => {
       setNewFeedUrl('');
     } catch (error) {
       console.error('Error adding feed:', error);
-      // Log the full error for debugging
       if (error instanceof Error) {
         console.error('Error message:', error.message);
         console.error('Error stack:', error.stack);
@@ -76,7 +81,7 @@ const RSSFeedList = () => {
       return;
     }
     
-    if (!isAdmin()) {
+    if (!canManageFeeds()) {
       return;
     }
     
@@ -93,7 +98,7 @@ const RSSFeedList = () => {
       return;
     }
     
-    if (!isAdmin()) {
+    if (!canManageFeeds()) {
       return;
     }
     
@@ -112,6 +117,28 @@ const RSSFeedList = () => {
     }
   };
 
+  const getRoleIcon = () => {
+    if (!profile) return <Eye className="w-3 h-3 mr-1" />;
+    
+    switch (profile.role) {
+      case 'admin': return <Shield className="w-3 h-3 mr-1" />;
+      case 'manager': return <Settings className="w-3 h-3 mr-1" />;
+      case 'lecteur': return <Eye className="w-3 h-3 mr-1" />;
+      default: return <Eye className="w-3 h-3 mr-1" />;
+    }
+  };
+
+  const getRoleLabel = () => {
+    if (!profile) return 'Lecteur';
+    
+    switch (profile.role) {
+      case 'admin': return 'Administrateur';
+      case 'manager': return 'Manager';
+      case 'lecteur': return 'Lecteur';
+      default: return 'Lecteur';
+    }
+  };
+
   if (selectedFeed) {
     return <FeedDetail feed={selectedFeed} onBack={() => setSelectedFeedId(null)} />;
   }
@@ -127,10 +154,6 @@ const RSSFeedList = () => {
     );
   }
 
-  // Debug log to check feeds count
-  console.log('Current feeds count:', feeds.length);
-  console.log('Translation key test:', t('rss.subtitle', { count: feeds.length }));
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -139,25 +162,15 @@ const RSSFeedList = () => {
             {t('rss.title')}
           </h2>
           <p className="text-muted-foreground mt-1">
-            {/* Force l'affichage du count en utilisant replace pour debug */}
             {t('rss.subtitle').replace('{count}', feeds.length.toString())}
           </p>
           {user && (
             <div className="flex items-center mt-2 space-x-2">
-              <Badge variant={isAdmin() ? "default" : "secondary"} className="text-xs">
-                {isAdmin() ? (
-                  <>
-                    <Shield className="w-3 h-3 mr-1" />
-                    Administrateur
-                  </>
-                ) : (
-                  <>
-                    <Eye className="w-3 h-3 mr-1" />
-                    Lecteur
-                  </>
-                )}
+              <Badge variant={profile?.role === 'admin' ? "default" : profile?.role === 'manager' ? "secondary" : "outline"} className="text-xs">
+                {getRoleIcon()}
+                {getRoleLabel()}
               </Badge>
-              {!isAdmin() && (
+              {!canManageFeeds() && (
                 <p className="text-xs text-muted-foreground">
                   Vous êtes en mode lecture seule
                 </p>
@@ -166,7 +179,7 @@ const RSSFeedList = () => {
           )}
         </div>
         <div className="flex space-x-2">
-          {user && isAdmin() ? (
+          {user && canManageFeeds() ? (
             <>
               <Input
                 placeholder={t('rss.addPlaceholder')}
@@ -199,7 +212,7 @@ const RSSFeedList = () => {
           ) : (
             <div className="text-sm text-muted-foreground bg-gray-50 px-3 py-2 rounded border">
               <Lock className="w-4 h-4 inline mr-1" />
-              Seuls les admins peuvent ajouter des flux
+              Seuls les admins et managers peuvent ajouter des flux
             </div>
           )}
         </div>
@@ -282,7 +295,7 @@ const RSSFeedList = () => {
       <div className="grid gap-6">
         {filteredFeeds.map((feed) => {
           const isDeleting = deletingFeedId === feed.id;
-          const canModify = user && isAdmin();
+          const canModify = user && canManageFeeds();
           
           return (
             <Card 
@@ -404,7 +417,6 @@ const RSSFeedList = () => {
                   <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                     <span className="flex items-center">
                       <Calendar className="w-3 h-3 mr-1" />
-                      {/* Force l'affichage de la date */}
                       Mis à jour: {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')}
                     </span>
                   </div>
