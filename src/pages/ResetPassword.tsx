@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Lock, Globe, RefreshCw, AlertCircle } from 'lucide-react';
 import { usePasswordReset } from '@/hooks/usePasswordReset';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { supabase } from '@/integrations/supabase/client';
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -17,31 +18,59 @@ const ResetPassword = () => {
   const [error, setError] = useState('');
   const [hasValidToken, setHasValidToken] = useState(false);
   const [tokenError, setTokenError] = useState('');
+  const [initializing, setInitializing] = useState(true);
 
   useEffect(() => {
-    // Vérifier les paramètres d'erreur dans l'URL (format #error=...)
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const errorParam = hashParams.get('error');
-    const errorDescription = hashParams.get('error_description');
-    
-    if (errorParam) {
-      if (errorParam === 'access_denied' && errorDescription?.includes('expired')) {
-        setTokenError('Le lien de réinitialisation a expiré. Veuillez demander un nouveau lien.');
-      } else {
-        setTokenError('Le lien de réinitialisation est invalide. Veuillez demander un nouveau lien.');
-      }
-      return;
-    }
+    const initializeAuth = async () => {
+      try {
+        // Vérifier les paramètres d'erreur dans l'URL (format #error=...)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const errorParam = hashParams.get('error');
+        const errorDescription = hashParams.get('error_description');
+        
+        if (errorParam) {
+          if (errorParam === 'access_denied' && errorDescription?.includes('expired')) {
+            setTokenError('Le lien de réinitialisation a expiré. Veuillez demander un nouveau lien.');
+          } else {
+            setTokenError('Le lien de réinitialisation est invalide. Veuillez demander un nouveau lien.');
+          }
+          setInitializing(false);
+          return;
+        }
 
-    // Vérifier si on a un token de reset dans l'URL
-    const accessToken = hashParams.get('access_token');
-    const refreshToken = hashParams.get('refresh_token');
-    
-    if (accessToken && refreshToken) {
-      setHasValidToken(true);
-    } else {
-      setTokenError('Aucun token de réinitialisation trouvé. Veuillez utiliser le lien depuis votre email.');
-    }
+        // Vérifier si on a des tokens dans l'URL
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        
+        if (accessToken && refreshToken) {
+          // Utiliser les tokens pour établir la session
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (error) {
+            console.error('Error setting session:', error);
+            setTokenError('Erreur lors de l\'authentification. Veuillez demander un nouveau lien.');
+          } else if (data.session) {
+            setHasValidToken(true);
+            // Nettoyer l'URL des tokens pour des raisons de sécurité
+            window.history.replaceState({}, document.title, window.location.pathname);
+          } else {
+            setTokenError('Session invalide. Veuillez demander un nouveau lien.');
+          }
+        } else {
+          setTokenError('Aucun token de réinitialisation trouvé. Veuillez utiliser le lien depuis votre email.');
+        }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        setTokenError('Erreur lors de l\'initialisation. Veuillez réessayer.');
+      } finally {
+        setInitializing(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -72,6 +101,18 @@ const ResetPassword = () => {
   const handleRequestNewLink = () => {
     navigate('/auth');
   };
+
+  // Écran de chargement pendant l'initialisation
+  if (initializing) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="flex items-center space-x-2">
+          <RefreshCw className="w-6 h-6 animate-spin" />
+          <span>Vérification du lien...</span>
+        </div>
+      </div>
+    );
+  }
 
   if (tokenError) {
     return (
