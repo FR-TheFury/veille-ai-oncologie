@@ -9,7 +9,10 @@ export const usePasswordReset = () => {
   const requestPasswordReset = async (email: string) => {
     setIsLoading(true);
     
-    const redirectUrl = `${window.location.origin}/reset-password`;
+    // Détecter si on est sur GitHub Pages et construire l'URL correcte
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const basename = isGitHubPages ? "/veille-ai-oncologie" : "";
+    const redirectUrl = `${window.location.origin}${basename}/reset-password`;
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
