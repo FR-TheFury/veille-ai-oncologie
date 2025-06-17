@@ -35,6 +35,27 @@ export interface Article {
   created_at: string;
 }
 
+// Nouvelle interface pour tous les articles (RSS + individuels)
+export interface CombinedArticle {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  url: string;
+  author: string;
+  published_at: string;
+  relevance_score: number;
+  keywords: string[];
+  created_at: string;
+  feed_id?: string; // Présent pour les articles RSS
+  added_by_user_id?: string; // Présent pour les articles individuels
+  source_type: 'rss' | 'standalone';
+  categories?: {
+    name: string;
+    color: string;
+  };
+}
+
 export function useRSSFeeds() {
   return useQuery({
     queryKey: ['rss-feeds'],
@@ -52,6 +73,68 @@ export function useRSSFeeds() {
 
       if (error) throw error;
       return data as Feed[];
+    },
+  });
+}
+
+// Nouvelle fonction pour récupérer tous les articles (RSS + individuels)
+export function useAllArticles(feedId?: string) {
+  return useQuery({
+    queryKey: ['all-articles', feedId],
+    queryFn: async () => {
+      // Récupérer les articles RSS
+      let rssQuery = supabase
+        .from('articles')
+        .select(`
+          *,
+          rss_feeds!inner(
+            categories(name, color)
+          )
+        `)
+        .order('published_at', { ascending: false });
+
+      if (feedId) {
+        rssQuery = rssQuery.eq('feed_id', feedId);
+      }
+
+      const { data: rssArticles, error: rssError } = await rssQuery;
+      if (rssError) throw rssError;
+
+      // Récupérer les articles individuels seulement si aucun feed spécifique n'est demandé
+      let standaloneArticles: any[] = [];
+      if (!feedId) {
+        const { data: standaloneData, error: standaloneError } = await supabase
+          .from('standalone_articles')
+          .select(`
+            *,
+            categories(name, color)
+          `)
+          .order('published_at', { ascending: false });
+
+        if (standaloneError) throw standaloneError;
+        standaloneArticles = standaloneData || [];
+      }
+
+      // Combiner et formatter les articles
+      const combinedArticles: CombinedArticle[] = [
+        ...rssArticles.map(article => ({
+          ...article,
+          source_type: 'rss' as const,
+          categories: article.rss_feeds?.categories
+        })),
+        ...standaloneArticles.map(article => ({
+          ...article,
+          feed_id: undefined,
+          source_type: 'standalone' as const
+        }))
+      ];
+
+      // Trier par date de publication
+      return combinedArticles.sort((a, b) => {
+        const dateA = new Date(a.published_at || a.created_at);
+        const dateB = new Date(b.published_at || b.created_at);
+        return dateB.getTime() - dateA.getTime();
+      });
     },
   });
 }

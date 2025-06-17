@@ -202,6 +202,62 @@ export type Database = {
           },
         ]
       }
+      standalone_articles: {
+        Row: {
+          added_by_user_id: string | null
+          author: string | null
+          category_id: string | null
+          content: string | null
+          created_at: string
+          id: string
+          keywords: string[] | null
+          published_at: string | null
+          relevance_score: number | null
+          summary: string | null
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          added_by_user_id?: string | null
+          author?: string | null
+          category_id?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string[] | null
+          published_at?: string | null
+          relevance_score?: number | null
+          summary?: string | null
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          added_by_user_id?: string | null
+          author?: string | null
+          category_id?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          keywords?: string[] | null
+          published_at?: string | null
+          relevance_score?: number | null
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "standalone_articles_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
