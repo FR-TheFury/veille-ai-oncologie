@@ -40,6 +40,7 @@ export function StandaloneArticlesList() {
     const articleForDetail = {
       ...selectedArticle,
       feed_id: '', // Add feed_id as empty string for standalone articles
+      summary: selectedArticle.summary || '', // Ensure summary is always a string
       key_points: [], // StandaloneArticle doesn't have key_points
     };
     
