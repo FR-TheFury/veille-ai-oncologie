@@ -39,6 +39,7 @@ export function StandaloneArticlesList() {
     // Convert StandaloneArticle to Article format for ArticleDetail component
     const articleForDetail = {
       ...selectedArticle,
+      feed_id: '', // Add feed_id as empty string for standalone articles
       key_points: [], // StandaloneArticle doesn't have key_points
     };
     
