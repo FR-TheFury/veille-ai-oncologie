@@ -9,7 +9,10 @@ interface UserProfile {
   email: string;
   first_name?: string;
   last_name?: string;
-  role?: 'admin' | 'lecteur';
+  role?: 'admin' | 'manager' | 'lecteur';
+  totp_enabled?: boolean;
+  totp_secret?: string;
+  backup_codes?: string[];
 }
 
 interface AuthContextType {
