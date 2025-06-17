@@ -7,7 +7,7 @@ Application de veille technologique spécialisée dans l'intelligence artificiel
 
 AI Veille Tech est une plateforme moderne de veille technologique qui permet de suivre les dernières actualités et innovations dans le domaine de l'intelligence artificielle et des technologies émergentes.
 
-**URL du projet**: https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449
+**URL du projet**: https://fr-thefury.github.io/veille-ai-oncologie/
 
 ## Fonctionnalités
 
@@ -18,14 +18,6 @@ AI Veille Tech est une plateforme moderne de veille technologique qui permet de 
 - ⭐ Système de pertinence des contenus
 
 ## Comment modifier ce code ?
-
-Il existe plusieurs façons de modifier cette application.
-
-**Utiliser Lovable**
-
-Visitez simplement le [Projet Lovable](https://lovable.dev/projects/51966039-58eb-4232-8594-6f7613e40449) et commencez à donner des instructions.
-
-Les modifications effectuées via Lovable seront automatiquement commitées dans ce dépôt.
 
 **Utiliser votre IDE préféré**
 
@@ -78,14 +70,6 @@ Ce projet est construit avec :
 ## Comment déployer ce projet ?
 
 Ce projet est automatiquement déployé sur GitHub Pages via GitHub Actions.
-
-## Puis-je connecter un domaine personnalisé ?
-
-Oui, c'est possible !
-
-Pour connecter un domaine, naviguez vers Project > Settings > Domains et cliquez sur Connect Domain.
-
-En savoir plus ici : [Configuration d'un domaine personnalisé](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
 
 ## Structure du projet
 
