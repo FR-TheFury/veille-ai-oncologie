@@ -3,10 +3,11 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Trash2, Calendar, User, FileText, Sparkles } from 'lucide-react';
+import { ExternalLink, Trash2, Calendar, User, FileText, Sparkles, Eye } from 'lucide-react';
 import { useStandaloneArticles, useDeleteStandaloneArticle } from '@/hooks/useStandaloneArticles';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import ArticleDetail from './ArticleDetail';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,6 +23,7 @@ export function StandaloneArticlesList() {
   const { data: articles, isLoading } = useStandaloneArticles();
   const deleteArticleMutation = useDeleteStandaloneArticle();
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
+  const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
 
   const handleDelete = async () => {
     if (articleToDelete) {
@@ -29,6 +31,24 @@ export function StandaloneArticlesList() {
       setArticleToDelete(null);
     }
   };
+
+  const selectedArticle = articles?.find(article => article.id === selectedArticleId);
+
+  // If an article is selected, show the article detail view
+  if (selectedArticle) {
+    // Convert StandaloneArticle to Article format for ArticleDetail component
+    const articleForDetail = {
+      ...selectedArticle,
+      key_points: [], // StandaloneArticle doesn't have key_points
+    };
+    
+    return (
+      <ArticleDetail 
+        article={articleForDetail} 
+        onBack={() => setSelectedArticleId(null)} 
+      />
+    );
+  }
 
   if (isLoading) {
     return (
@@ -95,8 +115,16 @@ export function StandaloneArticlesList() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => window.open(article.url, '_blank')}
+                      onClick={() => setSelectedArticleId(article.id)}
                       className="hover:bg-blue-50 border-blue-200"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(article.url, '_blank')}
+                      className="hover:bg-green-50 border-green-200"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
