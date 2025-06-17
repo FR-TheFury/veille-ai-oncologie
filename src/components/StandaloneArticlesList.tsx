@@ -8,6 +8,7 @@ import { useStandaloneArticles, useDeleteStandaloneArticle } from '@/hooks/useSt
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import ArticleDetail from './ArticleDetail';
+import { useAuth } from '@/contexts/AuthContext';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,7 @@ export function StandaloneArticlesList() {
   const deleteArticleMutation = useDeleteStandaloneArticle();
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
+  const { canManageContent } = useAuth();
 
   const handleDelete = async () => {
     if (articleToDelete) {
@@ -41,6 +43,7 @@ export function StandaloneArticlesList() {
       ...selectedArticle,
       feed_id: '', // Add feed_id as empty string for standalone articles
       summary: selectedArticle.summary || '', // Ensure summary is always a string
+      content: selectedArticle.content || '', // Ensure content is always a string
       key_points: [], // StandaloneArticle doesn't have key_points
     };
     
@@ -79,9 +82,15 @@ export function StandaloneArticlesList() {
           <div className="text-center">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-500 mb-2">Aucun article individuel ajouté</p>
-            <p className="text-sm text-gray-400">
-              Utilisez le bouton ci-dessus pour ajouter votre premier article
-            </p>
+            {canManageContent() ? (
+              <p className="text-sm text-gray-400">
+                Utilisez le bouton ci-dessus pour ajouter votre premier article
+              </p>
+            ) : (
+              <p className="text-sm text-gray-400">
+                Seuls les administrateurs et managers peuvent ajouter des articles
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -130,14 +139,17 @@ export function StandaloneArticlesList() {
                     >
                       <ExternalLink className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setArticleToDelete(article.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    {canManageContent() && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setArticleToDelete(article.id)}
+                        disabled={deleteArticleMutation.isPending}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               </CardHeader>

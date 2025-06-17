@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Rss, RefreshCw, Trash2, FileText, TrendingUp, Clock, Globe, Zap } from 'lucide-react';
+import { Plus, Rss, RefreshCw, Trash2, FileText, TrendingUp, Clock, Globe, Zap, Lock } from 'lucide-react';
 import { useRSSFeeds, useAddRSSFeed, useDeleteRSSFeed, useFetchArticles } from '@/hooks/useRSSFeeds';
 import { useStandaloneArticles } from '@/hooks/useStandaloneArticles';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 import { AddStandaloneArticleDialog } from './AddStandaloneArticleDialog';
 import { StandaloneArticlesList } from './StandaloneArticlesList';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function RSSFeedList() {
   const [newFeedUrl, setNewFeedUrl] = useState('');
@@ -22,6 +23,7 @@ export function RSSFeedList() {
   const addFeedMutation = useAddRSSFeed();
   const deleteFeedMutation = useDeleteRSSFeed();
   const fetchArticlesMutation = useFetchArticles();
+  const { canManageContent, profile } = useAuth();
 
   const handleAddFeed = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,33 +133,50 @@ export function RSSFeedList() {
         </TabsList>
 
         <TabsContent value="feeds" className="space-y-6">
-          {/* Formulaire d'ajout de flux RSS */}
-          <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-blue-900">
-                <Plus className="h-5 w-5" />
-                Ajouter un flux RSS
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleAddFeed} className="flex gap-2">
-                <Input
-                  type="url"
-                  placeholder="https://example.com/rss.xml"
-                  value={newFeedUrl}
-                  onChange={(e) => setNewFeedUrl(e.target.value)}
-                  className="flex-1 border-blue-200 focus:border-blue-400"
-                />
-                <Button 
-                  type="submit" 
-                  disabled={addFeedMutation.isPending || !newFeedUrl.trim()}
-                  className="bg-blue-600 hover:bg-blue-700"
-                >
-                  {addFeedMutation.isPending ? 'Ajout...' : 'Ajouter'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          {/* Formulaire d'ajout de flux RSS - Visible uniquement pour admin/manager */}
+          {canManageContent() ? (
+            <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-blue-900">
+                  <Plus className="h-5 w-5" />
+                  Ajouter un flux RSS
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleAddFeed} className="flex gap-2">
+                  <Input
+                    type="url"
+                    placeholder="https://example.com/rss.xml"
+                    value={newFeedUrl}
+                    onChange={(e) => setNewFeedUrl(e.target.value)}
+                    className="flex-1 border-blue-200 focus:border-blue-400"
+                  />
+                  <Button 
+                    type="submit" 
+                    disabled={addFeedMutation.isPending || !newFeedUrl.trim()}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {addFeedMutation.isPending ? 'Ajout...' : 'Ajouter'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-2">Accès restreint</p>
+                  <p className="text-sm text-gray-400">
+                    Seuls les administrateurs et managers peuvent gérer les flux RSS
+                  </p>
+                  <Badge variant="outline" className="mt-2">
+                    Rôle actuel: {profile?.role === 'lecteur' ? 'Lecteur' : profile?.role}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Liste des flux RSS */}
           <div className="grid gap-4">
@@ -174,28 +193,31 @@ export function RSSFeedList() {
                         <p className="text-sm text-gray-600 mt-1 line-clamp-2">{feed.description}</p>
                       )}
                     </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleFetchArticles(feed.id)}
-                        disabled={fetchArticlesMutation.isPending}
-                        className="hover:bg-blue-50"
-                      >
-                        <RefreshCw className={`h-4 w-4 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleDeleteFeed(feed.id)}
-                        disabled={deleteFeedMutation.isPending}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+                    {canManageContent() && (
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleFetchArticles(feed.id)}
+                          disabled={fetchArticlesMutation.isPending}
+                          className="hover:bg-blue-50"
+                        >
+                          <RefreshCw className={`h-4 w-4 ${fetchArticlesMutation.isPending ? 'animate-spin' : ''}`} />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleDeleteFeed(feed.id)}
+                          disabled={deleteFeedMutation.isPending}
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardHeader>
+                
                 <CardContent>
                   <div className="flex flex-wrap gap-2 items-center text-sm">
                     <Badge 
@@ -255,7 +277,11 @@ export function RSSFeedList() {
                   <div className="text-center">
                     <Rss className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                     <p className="text-gray-500 mb-2">Aucun flux RSS configuré</p>
-                    <p className="text-sm text-gray-400">Ajoutez votre premier flux ci-dessus pour commencer</p>
+                    {canManageContent() ? (
+                      <p className="text-sm text-gray-400">Ajoutez votre premier flux ci-dessus pour commencer</p>
+                    ) : (
+                      <p className="text-sm text-gray-400">Contactez un administrateur pour ajouter des flux RSS</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -264,37 +290,56 @@ export function RSSFeedList() {
         </TabsContent>
 
         <TabsContent value="articles" className="space-y-6">
-          {/* Bouton d'ajout d'article */}
-          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-purple-900">
-                <Plus className="h-5 w-5" />
-                Ajouter un article
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => setShowAddArticleDialog(true)}
-                className="bg-purple-600 hover:bg-purple-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Ajouter un article individuel
-              </Button>
-              <p className="text-sm text-purple-600 mt-2">
-                Ajoutez simplement l'URL, les métadonnées seront extraites automatiquement
-              </p>
-            </CardContent>
-          </Card>
+          {/* Bouton d'ajout d'article - Visible uniquement pour admin/manager */}
+          {canManageContent() ? (
+            <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-purple-900">
+                  <Plus className="h-5 w-5" />
+                  Ajouter un article
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Button 
+                  onClick={() => setShowAddArticleDialog(true)}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter un article individuel
+                </Button>
+                <p className="text-sm text-purple-600 mt-2">
+                  Ajoutez simplement l'URL, les métadonnées seront extraites automatiquement
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="bg-gradient-to-r from-gray-50 to-gray-100 border-gray-200">
+              <CardContent className="pt-6">
+                <div className="text-center">
+                  <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-500 mb-2">Accès restreint</p>
+                  <p className="text-sm text-gray-400">
+                    Seuls les administrateurs et managers peuvent ajouter des articles
+                  </p>
+                  <Badge variant="outline" className="mt-2">
+                    Rôle actuel: {profile?.role === 'lecteur' ? 'Lecteur' : profile?.role}
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Liste des articles individuels */}
           <StandaloneArticlesList />
         </TabsContent>
       </Tabs>
 
-      <AddStandaloneArticleDialog 
-        open={showAddArticleDialog} 
-        onOpenChange={setShowAddArticleDialog} 
-      />
+      {canManageContent() && (
+        <AddStandaloneArticleDialog 
+          open={showAddArticleDialog} 
+          onOpenChange={setShowAddArticleDialog} 
+        />
+      )}
     </div>
   );
 }
