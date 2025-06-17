@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Trash2, Calendar, User } from 'lucide-react';
+import { ExternalLink, Trash2, Calendar, User, FileText, Sparkles } from 'lucide-react';
 import { useStandaloneArticles, useDeleteStandaloneArticle } from '@/hooks/useStandaloneArticles';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
@@ -36,12 +36,12 @@ export function StandaloneArticlesList() {
         {[...Array(3)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader>
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-4 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-3/4"></div>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
-                <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-full"></div>
+                <div className="h-3 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-2/3"></div>
               </div>
             </CardContent>
           </Card>
@@ -52,11 +52,15 @@ export function StandaloneArticlesList() {
 
   if (!articles || articles.length === 0) {
     return (
-      <Card>
+      <Card className="bg-gradient-to-br from-gray-50 to-gray-100">
         <CardContent className="pt-6">
-          <p className="text-center text-gray-500">
-            Aucun article individuel ajouté pour le moment.
-          </p>
+          <div className="text-center">
+            <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-500 mb-2">Aucun article individuel ajouté</p>
+            <p className="text-sm text-gray-400">
+              Utilisez le bouton ci-dessus pour ajouter votre premier article
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
@@ -65,81 +69,109 @@ export function StandaloneArticlesList() {
   return (
     <>
       <div className="space-y-4">
-        {articles.map((article) => (
-          <Card key={article.id} className="hover:shadow-md transition-shadow">
-            <CardHeader>
-              <div className="flex justify-between items-start gap-4">
-                <CardTitle className="text-lg line-clamp-2">
-                  {article.title}
-                </CardTitle>
-                <div className="flex gap-2 flex-shrink-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => window.open(article.url, '_blank')}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setArticleToDelete(article.id)}
-                    className="text-red-600 hover:text-red-700"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+        {articles.map((article, index) => {
+          // Cycle through gradient colors for visual variety
+          const gradients = [
+            'from-purple-50 to-pink-50 border-purple-200',
+            'from-blue-50 to-cyan-50 border-blue-200', 
+            'from-green-50 to-emerald-50 border-green-200',
+            'from-orange-50 to-red-50 border-orange-200',
+            'from-indigo-50 to-purple-50 border-indigo-200'
+          ];
+          const gradientClass = gradients[index % gradients.length];
+
+          return (
+            <Card 
+              key={article.id} 
+              className={`hover:shadow-lg transition-all duration-300 bg-gradient-to-br ${gradientClass} border-l-4 hover:scale-[1.01]`}
+            >
+              <CardHeader>
+                <div className="flex justify-between items-start gap-4">
+                  <CardTitle className="text-lg line-clamp-2 flex items-start gap-2">
+                    <Sparkles className="h-5 w-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                    {article.title}
+                  </CardTitle>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => window.open(article.url, '_blank')}
+                      className="hover:bg-blue-50 border-blue-200"
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setArticleToDelete(article.id)}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            
-            <CardContent className="space-y-3">
-              {article.summary && (
-                <p className="text-gray-600 line-clamp-3">
-                  {article.summary}
-                </p>
-              )}
+              </CardHeader>
               
-              <div className="flex flex-wrap gap-2 items-center text-sm text-gray-500">
-                {article.author && (
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    {article.author}
+              <CardContent className="space-y-4">
+                {article.summary && (
+                  <div className="p-3 bg-white/60 rounded-lg border border-white/40">
+                    <p className="text-gray-700 line-clamp-3 text-sm leading-relaxed">
+                      {article.summary}
+                    </p>
                   </div>
                 )}
                 
-                {article.published_at && (
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {format(new Date(article.published_at), 'dd MMM yyyy', { locale: fr })}
-                  </div>
-                )}
-                
-                {article.categories && (
-                  <Badge 
-                    variant="secondary" 
-                    style={{ backgroundColor: `${article.categories.color}20`, color: article.categories.color }}
-                  >
-                    {article.categories.name}
-                  </Badge>
-                )}
-              </div>
-              
-              {article.keywords && article.keywords.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {article.keywords.map((keyword, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
-                      {keyword}
+                <div className="flex flex-wrap gap-3 items-center text-sm">
+                  {article.author && (
+                    <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
+                      <User className="h-3 w-3" />
+                      <span className="font-medium">{article.author}</span>
+                    </div>
+                  )}
+                  
+                  {article.published_at && (
+                    <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
+                      <Calendar className="h-3 w-3" />
+                      <span>{format(new Date(article.published_at), 'dd MMM yyyy', { locale: fr })}</span>
+                    </div>
+                  )}
+                  
+                  {article.categories && (
+                    <Badge 
+                      variant="secondary" 
+                      className="border"
+                      style={{ 
+                        backgroundColor: `${article.categories.color}20`, 
+                        color: article.categories.color,
+                        borderColor: article.categories.color
+                      }}
+                    >
+                      {article.categories.name}
                     </Badge>
-                  ))}
+                  )}
                 </div>
-              )}
-              
-              <div className="text-xs text-gray-400">
-                Ajouté le {format(new Date(article.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                
+                {article.keywords && article.keywords.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {article.keywords.map((keyword, index) => (
+                      <Badge 
+                        key={index} 
+                        variant="outline" 
+                        className="text-xs bg-white/40 border-gray-300 hover:bg-white/60 transition-colors"
+                      >
+                        #{keyword}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                
+                <div className="text-xs text-gray-500 bg-white/30 px-2 py-1 rounded">
+                  ✨ Ajouté le {format(new Date(article.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
 
       <AlertDialog open={!!articleToDelete} onOpenChange={() => setArticleToDelete(null)}>
