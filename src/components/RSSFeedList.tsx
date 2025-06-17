@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, RefreshCw, Trash2, ExternalLink, Calendar, User, BookOpen, Eye, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,6 +24,7 @@ import ArticleDetail from '@/components/ArticleDetail';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { toast } from 'sonner';
 import type { Feed } from '@/hooks/useRSSFeeds';
 
 export function RSSFeedList() {
@@ -41,7 +41,9 @@ export function RSSFeedList() {
   const addFeedMutation = useAddRSSFeed();
   const deleteFeedMutation = useDeleteRSSFeed();
   const fetchArticlesMutation = useFetchArticles();
-  const { canManageContent } = useAuth();
+  const { user, canManageContent } = useAuth();
+
+  console.log('🔍 Debug auth state:', { user: !!user, canManage: canManageContent() });
 
   // Si un flux est sélectionné, afficher les détails du flux
   if (selectedFeed) {
@@ -57,6 +59,7 @@ export function RSSFeedList() {
         ...selectedArticle,
         feed_id: selectedArticle.feed_id || '',
         key_points: [],
+        keywords: selectedArticle.keywords || [],
       };
       return (
         <ArticleDetail 
@@ -102,16 +105,31 @@ export function RSSFeedList() {
   }
 
   const handleAddFeed = async () => {
-    if (newFeedUrl.trim()) {
+    if (!newFeedUrl.trim()) {
+      toast.error('Veuillez entrer une URL valide');
+      return;
+    }
+
+    try {
       await addFeedMutation.mutateAsync(newFeedUrl.trim());
       setNewFeedUrl('');
+    } catch (error) {
+      console.error('Error adding feed:', error);
     }
   };
 
   const handleDelete = async () => {
-    if (feedToDelete) {
+    if (!feedToDelete) return;
+
+    console.log('🗑️ Attempting to delete feed:', feedToDelete);
+    
+    try {
       await deleteFeedMutation.mutateAsync(feedToDelete);
       setFeedToDelete(null);
+      toast.success('Flux RSS supprimé avec succès !');
+    } catch (error) {
+      console.error('❌ Error deleting feed:', error);
+      toast.error('Erreur lors de la suppression du flux RSS');
     }
   };
 
@@ -292,7 +310,10 @@ export function RSSFeedList() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => setFeedToDelete(feed.id)}
+                              onClick={() => {
+                                console.log('🔴 Setting feed to delete:', feed.id);
+                                setFeedToDelete(feed.id);
+                              }}
                               disabled={deleteFeedMutation.isPending}
                               className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
                             >
@@ -426,8 +447,9 @@ export function RSSFeedList() {
               <AlertDialogAction 
                 onClick={handleDelete}
                 className="bg-red-600 hover:bg-red-700"
+                disabled={deleteFeedMutation.isPending}
               >
-                Supprimer
+                {deleteFeedMutation.isPending ? 'Suppression...' : 'Supprimer'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
