@@ -47,6 +47,7 @@ export function StandaloneArticlesList() {
       author: selectedArticle.author || '', // Ensure author is always a string
       published_at: selectedArticle.published_at || selectedArticle.created_at, // Ensure published_at is always defined
       relevance_score: selectedArticle.relevance_score || 0.5, // Ensure relevance_score is always a number
+      keywords: selectedArticle.keywords || [], // Ensure keywords is always an array
       key_points: [], // StandaloneArticle doesn't have key_points
     };
     
