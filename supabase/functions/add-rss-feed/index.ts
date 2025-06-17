@@ -379,22 +379,43 @@ serve(async (req) => {
     
     // Retourner une erreur plus spécifique selon le type d'erreur
     let errorMessage = error.message || 'Une erreur inconnue s\'est produite';
+    let statusCode = 400;
     
     if (errorMessage.includes('Timeout')) {
       errorMessage = 'Le flux RSS met trop de temps à répondre. Veuillez réessayer plus tard.';
+      statusCode = 408;
     } else if (errorMessage.includes('500')) {
       errorMessage = 'Le serveur du flux RSS a rencontré une erreur. Veuillez vérifier l\'URL ou réessayer plus tard.';
+      statusCode = 502;
     } else if (errorMessage.includes('404')) {
       errorMessage = 'Le flux RSS n\'a pas été trouvé. Veuillez vérifier l\'URL.';
+      statusCode = 404;
     } else if (errorMessage.includes('403')) {
-      errorMessage = 'L\'accès au flux RSS est interdit. Le site pourrait bloquer les bots.';
+      errorMessage = 'L\'accès au flux RSS est interdit. Le site pourrait bloquer les bots ou nécessiter une authentification.';
+      statusCode = 403;
+    } else if (errorMessage.includes('Erreur HTTP')) {
+      // Extraire le code d'erreur HTTP du message
+      const httpCodeMatch = errorMessage.match(/Erreur HTTP (\d+)/);
+      if (httpCodeMatch) {
+        const httpCode = parseInt(httpCodeMatch[1]);
+        statusCode = httpCode;
+        
+        if (httpCode >= 500) {
+          errorMessage = 'Erreur du serveur source. Le site RSS rencontre des problèmes techniques.';
+        } else if (httpCode === 429) {
+          errorMessage = 'Trop de requêtes. Le site RSS limite l\'accès. Réessayez plus tard.';
+        } else if (httpCode >= 400) {
+          errorMessage = `Erreur d'accès au flux RSS (${httpCode}). Vérifiez l'URL et les permissions.`;
+        }
+      }
     }
     
     return new Response(JSON.stringify({ 
       success: false, 
-      error: errorMessage
+      error: errorMessage,
+      details: error.message
     }), {
-      status: 400,
+      status: statusCode,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   }
