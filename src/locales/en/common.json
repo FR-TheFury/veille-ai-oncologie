@@ -1,303 +1,211 @@
 
 {
-  "header": {
-    "title": "OncIA Watch",
-    "subtitle": "AI Technology Watch",
-    "rssFeeds": "RSS Feeds",
-    "about": "About",
-    "searchPlaceholder": "Search articles, technologies, researchers...",
+  "auth": {
     "signIn": "Sign In",
-    "notifications": {
-      "title": "Notifications",
-      "empty": "No notifications",
-      "newArticles": "New articles available",
-      "feedUpdated": "RSS feed updated",
-      "twoHoursAgo": "2 hours ago",
-      "fiveHoursAgo": "5 hours ago"
-    }
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "signUp": "Sign Up",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "resetPassword": "Reset Password",
+    "signInToAccount": "Sign in to your account",
+    "createAccount": "Create an account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "sendResetLink": "Send reset link",
+    "backToSignIn": "Back to sign in",
+    "checkEmail": "Check your email",
+    "resetLinkSent": "A reset link has been sent to your email address.",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "firstNameRequired": "First name is required",
+    "lastNameRequired": "Last name is required",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "invalidEmail": "Invalid email",
+    "passwordTooShort": "Password must be at least 6 characters"
+  },
+  "nav": {
+    "feeds": "RSS Feeds",
+    "profile": "Profile",
+    "users": "Users",
+    "about": "About",
+    "dashboard": "Dashboard"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "view": "View",
+    "actions": "Actions",
+    "settings": "Settings",
+    "help": "Help",
+    "more": "More",
+    "less": "Less",
+    "all": "All",
+    "none": "None",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "select": "Select",
+    "upload": "Upload",
+    "download": "Download",
+    "export": "Export",
+    "import": "Import",
+    "print": "Print",
+    "share": "Share",
+    "copy": "Copy",
+    "paste": "Paste",
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo"
   },
   "rss": {
-    "title": "RSS Feeds - AI & Oncology",
-    "subtitle": "Follow {{count}} specialized sources for your technology watch",
-    "mainTitle": "AI Technology Watch & Oncology",
-    "mainSubtitle": "Stay informed about the latest advances in artificial intelligence applied to oncology",
-    "addFeed": "Add",
-    "addPlaceholder": "RSS feed URL...",
-    "loading": "Loading RSS feeds...",
-    "noFeeds": "No RSS feeds",
-    "noFeedsSubtitle": "Add your first RSS feed to start your watch.",
-    "noFeedsForAdmins": "Add your first RSS feed above to get started",
-    "noFeedsForUsers": "Only administrators and managers can add feeds",
-    "categories": {
-      "all": "All"
-    },
+    "mainTitle": "Technology Watch Center",
+    "mainSubtitle": "Stay informed about the latest advances in oncology and health technologies",
+    "title": "RSS Feeds",
+    "addFeed": "Add Feed",
+    "addPlaceholder": "RSS feed URL (e.g. https://example.com/feed.xml)",
+    "noFeeds": "No RSS feeds configured",
+    "noFeedsSubtitle": "Start by adding your first RSS feed to automatically receive articles.",
+    "noFeedsForAdmins": "Use the field above to add your first RSS feed.",
+    "noFeedsForUsers": "Contact an administrator to add RSS feeds.",
     "stats": {
       "feeds": "RSS Feeds",
-      "articles": "Articles",
-      "categories": "Categories",
-      "displayed": "Displayed",
       "standaloneArticles": "Standalone Articles",
       "totalArticles": "Total Articles"
     },
-    "actions": {
-      "update": "Update",
-      "details": "Details",
-      "view": "View",
-      "viewArticles": "View articles",
-      "delete": "Delete",
-      "adding": "Adding...",
-      "deleting": "Deleting...",
-      "backToFeeds": "Back to RSS Feeds",
-      "addArticle": "Add Article",
-      "standaloneArticles": "Standalone articles"
-    },
     "status": {
-      "error": "Error",
-      "uncategorized": "Uncategorized",
-      "lastUpdated": "Updated: {{date}}",
-      "never": "Never",
-      "articlesCount": "{{count}} articles",
       "active": "Active",
       "inactive": "Inactive",
-      "updatedOn": "Updated on {{date}}"
+      "never": "Never",
+      "lastUpdated": "Updated on {{date}}",
+      "articlesCount": "{{count}} articles"
+    },
+    "actions": {
+      "adding": "Adding...",
+      "deleting": "Deleting...",
+      "backToFeeds": "Back to feeds",
+      "addArticle": "Add article"
     },
     "messages": {
       "enterValidUrl": "Please enter a valid URL",
-      "feedDeletedSuccess": "RSS feed deleted successfully!",
-      "feedDeleteError": "Error deleting RSS feed",
-      "confirmDelete": "Delete RSS feed",
-      "confirmDeleteMessage": "Are you sure you want to delete this RSS feed? All associated articles will also be deleted. This action is irreversible.",
-      "cancel": "Cancel"
+      "feedDeletedSuccess": "Feed deleted successfully",
+      "feedDeleteError": "Error deleting feed",
+      "confirmDelete": "Confirm deletion",
+      "confirmDeleteMessage": "Are you sure you want to delete this RSS feed? This action is irreversible and will also delete all associated articles."
     }
   },
   "feed": {
     "back": "Back",
     "update": "Update",
-    "stats": {
-      "totalArticles": "Total articles",
-      "lastUpdate": "Last update",
-      "averageScore": "Average score"
-    },
-    "recentArticles": "Recent articles",
-    "noArticles": "No articles",
-    "noArticlesSubtitle": "No articles available for this feed.",
+    "recentArticles": "Recent Articles",
+    "noArticles": "No articles available",
+    "noArticlesSubtitle": "This feed doesn't have articles yet or they haven't been fetched.",
     "fetchArticles": "Fetch articles",
     "loadingArticles": "Loading articles...",
     "readMore": "Read more",
-    "score": "Score: {{score}}%",
     "publishedOn": "Published on {{date}}",
     "by": "By {{author}}",
-    "unknownDate": "Unknown date"
+    "unknownDate": "Unknown date",
+    "stats": {
+      "totalArticles": "Total Articles",
+      "lastUpdate": "Last Update",
+      "averageScore": "Average Score"
+    }
   },
   "article": {
     "back": "Back",
     "article": "Article",
-    "summary": "Summary",
-    "readingTime": "{{minutes}} min read",
-    "keywords": "Keywords",
-    "viewOriginal": "View original article",
+    "reading": "~5 min read",
     "detailedSummary": "Detailed Summary",
-    "keyPoints": "Key Points to Remember",
-    "mainContent": "Main Content",
-    "reading": "Reading: 8-10 minutes",
-    "translating": "Translating...",
-    "translationError": "Translation error",
-    "noContent": "No content available",
+    "keyPoints": "Key Points",
+    "viewOriginal": "View Original Article",
     "content": {
-      "introduction": "Artificial intelligence is revolutionizing oncology by enabling earlier detection, more accurate diagnosis, and personalized treatments. This technological breakthrough represents a paradigm shift in how we approach cancer care.",
+      "introduction": "Artificial intelligence is revolutionizing the field of oncology by providing sophisticated tools to improve diagnosis, treatment, and patient monitoring for cancer patients. This emerging technology promises to radically transform oncological care.",
       "applications": {
-        "title": "Main Applications",
+        "title": "Applications in oncology",
         "diagnosticImaging": {
-          "title": "Diagnostic Imaging",
-          "description": "Computer vision algorithms analyze medical images (CT scans, MRIs, X-rays) to detect anomalies invisible to the naked eye. This technology is particularly effective for early lung cancer detection, mammography analysis for breast cancer, and skin biopsy examination for melanoma."
+          "title": "Diagnostic imaging",
+          "description": "AI algorithms analyze medical images with remarkable precision, detecting subtle abnormalities that the human eye might miss. This technology significantly improves the early detection of diseases."
         },
         "personalizedMedicine": {
-          "title": "Personalized Medicine",
-          "description": "AI enables treatment personalization by analyzing patient genetic profiles, medical history, specific tumor characteristics, and response to previous treatments."
+          "title": "Personalized medicine",
+          "description": "AI enables analysis of tumor genomic profiles to propose tailored treatments, thus optimizing therapeutic efficacy while minimizing side effects."
         }
       },
       "results": {
-        "title": "Promising Results",
-        "description": "Recent studies show encouraging results: 30% reduction in diagnostic errors, 25% improvement in 5-year survival rate, and reduction of side effects through personalized treatments."
+        "title": "Promising results",
+        "description": "Clinical studies show significant improvement in survival rates and quality of life for patients through the use of AI in oncology. Algorithms achieve diagnostic precision levels comparable to, or even superior to, those of specialists."
       },
       "challenges": {
-        "title": "Challenges and Perspectives",
-        "description": "Despite these advances, several challenges remain: explainability of AI decisions, large-scale clinical validation, integration into existing hospital systems, and ethical and regulatory questions. The future looks promising with the emergence of new techniques like federated learning and multimodal AI."
+        "title": "Challenges and perspectives",
+        "description": "Despite its potential, implementing AI in oncology faces important challenges: rigorous clinical validation, ethical questions, healthcare professional training, and integration into existing workflows."
       }
     },
     "defaultKeywords": {
       "ai": "Artificial Intelligence",
       "oncology": "Oncology",
       "machinelearning": "Machine Learning",
-      "deeplearning": "Deep Learning",
+      "research": "Research",
+      "cancer": "Cancer",
       "diagnosis": "Diagnosis",
       "treatment": "Treatment",
-      "cancer": "Cancer",
-      "research": "Research"
+      "technology": "Technology",
+      "medical": "Medical",
+      "healthcare": "Healthcare",
+      "innovation": "Innovation",
+      "precision": "Precision",
+      "therapy": "Therapy",
+      "clinical": "Clinical",
+      "algorithm": "Algorithm"
     }
-  },
-  "about": {
-    "title": "Our Technology Watch",
-    "subtitle": "Artificial Intelligence in Oncology: A systematic approach to tracking revolutionary innovations for MSPR 4",
-    "backToFeeds": "Back to RSS Feeds",
-    "projectContext": {
-      "title": "MSPR 4 Project Context",
-      "description": "This technology watch is conducted as part of our MSPR 4 project (Professional Situation Methods and Practice). We are 4 developers responsible for monitoring and analyzing the latest advances in AI applications for oncology.",
-      "areas": {
-        "earlyDetection": {
-          "title": "Early Detection",
-          "description": "AI for automated cancer cell detection"
-        },
-        "personalizedTreatment": {
-          "title": "Personalized Treatment",
-          "description": "Precision medicine based on data analysis"
-        },
-        "acceleratedResearch": {
-          "title": "Accelerated Research",
-          "description": "AI-assisted drug discovery"
-        }
-      }
-    },
-    "team": {
-      "title": "Our Development Team",
-      "description": "A multidisciplinary team of 4 developers covering technical, medical and ethical aspects:",
-      "expertise": {
-        "technical": "AI Technical Expertise",
-        "medical": "Medical Knowledge",
-        "regulatory": "Regulatory Analysis",
-        "competitive": "Competitive Intelligence"
-      }
-    },
-    "methodology": {
-      "title": "Our Methodology",
-      "sources": {
-        "title": "Diversified Sources",
-        "items": [
-          "Multiple RSS feeds covering several categories",
-          "Scientific journals: Nature, Cell, Science",
-          "Preprints: arXiv, bioRxiv, medRxiv",
-          "Conferences: MICCAI, ASCO",
-          "Institutes: NIH, INSERM",
-          "Tech News: MIT Tech Review"
-        ]
-      },
-      "analysis": {
-        "title": "Systematic Analysis",
-        "items": [
-          "Daily publication monitoring",
-          "Specialized keyword filtering",
-          "Classification by potential impact",
-          "Weekly synthesis meetings",
-          "Revolutionary technology alerts"
-        ]
-      }
-    },
-    "challenges": {
-      "title": "Key Challenges Identified",
-      "ethical": {
-        "title": "Ethical Issues",
-        "items": [
-          "Algorithmic bias",
-          "Decision transparency",
-          "Informed consent",
-          "Data protection"
-        ]
-      },
-      "technical": {
-        "title": "Technical Challenges",
-        "items": [
-          "Data quality",
-          "Interoperability",
-          "Clinical validation",
-          "Model robustness"
-        ]
-      },
-      "opportunities": {
-        "title": "Opportunities",
-        "items": [
-          "Ultra-early diagnosis",
-          "Personalized medicine",
-          "Cost reduction",
-          "Global accessibility"
-        ]
-      }
-    },
-    "trends": {
-      "title": "Emerging Trends 2024",
-      "multimodal": {
-        "title": "Multimodal AI",
-        "description": "Integration of medical imaging, genomic data and patient histories for holistic diagnosis"
-      },
-      "foundation": {
-        "title": "Foundation Models",
-        "description": "Pre-trained models adaptable to different cancer types and imaging modalities"
-      },
-      "explainable": {
-        "title": "Explainable AI",
-        "description": "Development of transparent systems for clinician and patient trust"
-      },
-      "edge": {
-        "title": "Edge Computing",
-        "description": "Deployment of embedded AI for real-time analysis during surgical interventions"
-      }
-    },
-    "stats": {
-      "title": "Our Watch in Numbers"
-    },
-    "objectives": {
-      "title": "MSPR 4 Learning Objectives",
-      "technical": {
-        "title": "Technical Skills",
-        "items": [
-          "Information collection and analysis",
-          "Technology trend identification",
-          "Critical source evaluation",
-          "Synthesis and reporting"
-        ]
-      },
-      "professional": {
-        "title": "Professional Skills",
-        "items": [
-          "Team collaboration",
-          "Project management",
-          "Presentation skills",
-          "Strategic thinking"
-        ]
-      }
-    },
-    "cta": "Explore our RSS Feeds"
   },
   "standalone": {
     "title": "Standalone Articles",
-    "noArticles": "No standalone articles added",
-    "noArticlesForAdmins": "Use the button above to add your first article",
-    "noArticlesForUsers": "Only administrators and managers can add articles",
-    "addedOn": "Added on {{date}}",
-    "view": "View",
-    "delete": "Delete",
-    "confirmDelete": "Delete article",
-    "confirmDeleteMessage": "Are you sure you want to delete this article? This action is irreversible.",
-    "deleteSuccess": "Article deleted successfully!",
-    "deleteError": "Error deleting article"
-  },
-  "stats": {
-    "feeds": "RSS Sources",
-    "articles": "Total Articles",
-    "categories": "Categories",
-    "developers": "Developers",
-    "loading": "Loading..."
-  },
-  "common": {
-    "loading": "Loading...",
-    "error": "Error",
-    "retry": "Retry",
-    "save": "Save",
-    "cancel": "Cancel",
-    "delete": "Delete",
-    "edit": "Edit",
-    "close": "Close",
-    "open": "Open",
-    "yes": "Yes",
-    "no": "No"
+    "add": "Add Article",
+    "noArticles": "No standalone articles",
+    "noArticlesSubtitle": "Start by adding your first standalone article.",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "Article title",
+      "url": "URL",
+      "urlPlaceholder": "https://example.com/article",
+      "author": "Author",
+      "authorPlaceholder": "Author name",
+      "summary": "Summary",
+      "summaryPlaceholder": "Article summary",
+      "keywords": "Keywords",
+      "keywordsPlaceholder": "Separate keywords with commas",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "relevanceScore": "Relevance Score"
+    },
+    "messages": {
+      "addSuccess": "Article added successfully",
+      "addError": "Error adding article",
+      "deleteSuccess": "Article deleted successfully",
+      "deleteError": "Error deleting article"
+    }
   }
 }

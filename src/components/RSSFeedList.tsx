@@ -414,13 +414,17 @@ export function RSSFeedList() {
                           {article.author && (
                             <div className="flex items-center gap-1">
                               <User className="h-3 w-3" />
-                              <span>{article.author}</span>
+                              <span>{t('feed.by', { author: article.author })}</span>
                             </div>
                           )}
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             <span>
-                              {format(new Date(article.published_at || article.created_at), 'dd MMM yyyy', { locale: dateLocale })}
+                              {t('feed.publishedOn', {
+                                date: article.published_at ? 
+                                  format(new Date(article.published_at), 'dd MMM yyyy', { locale: dateLocale }) :
+                                  format(new Date(article.created_at), 'dd MMM yyyy', { locale: dateLocale })
+                              })}
                             </span>
                           </div>
                           {article.source_type && (

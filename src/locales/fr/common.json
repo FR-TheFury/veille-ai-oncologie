@@ -1,303 +1,211 @@
 
 {
-  "header": {
-    "title": "OncIA Veille",
-    "subtitle": "Veille Technologique IA",
-    "rssFeeds": "Flux RSS",
-    "about": "À propos",
-    "searchPlaceholder": "Rechercher articles, technologies, chercheurs...",
+  "auth": {
     "signIn": "Se connecter",
-    "notifications": {
-      "title": "Notifications",
-      "empty": "Aucune notification",
-      "newArticles": "Nouveaux articles disponibles",
-      "feedUpdated": "Flux RSS mis à jour",
-      "twoHoursAgo": "Il y a 2h",
-      "fiveHoursAgo": "Il y a 5h"
-    }
+    "signOut": "Se déconnecter",
+    "email": "Email",
+    "password": "Mot de passe",
+    "signUp": "S'inscrire",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "confirmPassword": "Confirmer le mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "signInToAccount": "Se connecter à votre compte",
+    "createAccount": "Créer un compte",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "sendResetLink": "Envoyer le lien de réinitialisation",
+    "backToSignIn": "Retour à la connexion",
+    "checkEmail": "Vérifiez votre email",
+    "resetLinkSent": "Un lien de réinitialisation a été envoyé à votre adresse email.",
+    "invalidCredentials": "Identifiants invalides",
+    "emailRequired": "L'email est requis",
+    "passwordRequired": "Le mot de passe est requis",
+    "firstNameRequired": "Le prénom est requis",
+    "lastNameRequired": "Le nom est requis",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "invalidEmail": "Email invalide",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères"
+  },
+  "nav": {
+    "feeds": "Flux RSS",
+    "profile": "Profil",
+    "users": "Utilisateurs",
+    "about": "À propos",
+    "dashboard": "Tableau de bord"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "add": "Ajouter",
+    "close": "Fermer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "sort": "Trier",
+    "refresh": "Actualiser",
+    "view": "Voir",
+    "actions": "Actions",
+    "settings": "Paramètres",
+    "help": "Aide",
+    "more": "Plus",
+    "less": "Moins",
+    "all": "Tous",
+    "none": "Aucun",
+    "yes": "Oui",
+    "no": "Non",
+    "ok": "OK",
+    "apply": "Appliquer",
+    "reset": "Réinitialiser",
+    "clear": "Effacer",
+    "select": "Sélectionner",
+    "upload": "Télécharger",
+    "download": "Télécharger",
+    "export": "Exporter",
+    "import": "Importer",
+    "print": "Imprimer",
+    "share": "Partager",
+    "copy": "Copier",
+    "paste": "Coller",
+    "cut": "Couper",
+    "undo": "Annuler",
+    "redo": "Refaire"
   },
   "rss": {
-    "title": "Flux RSS - IA & Oncologie",
-    "subtitle": "Suivez {{count}} sources spécialisées pour votre veille technologique",
-    "mainTitle": "Veille Technologique IA & Oncologie",
-    "mainSubtitle": "Restez informé des dernières avancées en intelligence artificielle appliquée à l'oncologie",
-    "addFeed": "Ajouter",
-    "addPlaceholder": "URL du flux RSS...",
-    "loading": "Chargement des flux RSS...",
-    "noFeeds": "Aucun flux RSS",
-    "noFeedsSubtitle": "Ajoutez votre premier flux RSS pour commencer votre veille.",
-    "noFeedsForAdmins": "Ajoutez votre premier flux RSS ci-dessus pour commencer",
-    "noFeedsForUsers": "Seuls les administrateurs et managers peuvent ajouter des flux",
-    "categories": {
-      "all": "Tous"
-    },
+    "mainTitle": "Centre de Veille Technologique",
+    "mainSubtitle": "Restez informé des dernières avancées en oncologie et technologies de santé",
+    "title": "Flux RSS",
+    "addFeed": "Ajouter un flux",
+    "addPlaceholder": "URL du flux RSS (ex: https://example.com/feed.xml)",
+    "noFeeds": "Aucun flux RSS configuré",
+    "noFeedsSubtitle": "Commencez par ajouter votre premier flux RSS pour recevoir des articles automatiquement.",
+    "noFeedsForAdmins": "Utilisez le champ ci-dessus pour ajouter votre premier flux RSS.",
+    "noFeedsForUsers": "Contactez un administrateur pour ajouter des flux RSS.",
     "stats": {
       "feeds": "Flux RSS",
-      "articles": "Articles",
-      "categories": "Catégories",
-      "displayed": "Affichés",
       "standaloneArticles": "Articles individuels",
-      "totalArticles": "Articles total"
-    },
-    "actions": {
-      "update": "MAJ",
-      "details": "Détails",
-      "view": "Voir",
-      "viewArticles": "Voir les articles",
-      "delete": "Supprimer",
-      "adding": "Ajout...",
-      "deleting": "Suppression...",
-      "backToFeeds": "Retour aux flux RSS",
-      "addArticle": "Ajouter un article",
-      "standaloneArticles": "Articles individuels"
+      "totalArticles": "Articles totaux"
     },
     "status": {
-      "error": "Erreur",
-      "uncategorized": "Non catégorisé",
-      "lastUpdated": "Mis à jour: {{date}}",
-      "never": "Jamais",
-      "articlesCount": "{{count}} articles",
       "active": "Actif",
       "inactive": "Inactif",
-      "updatedOn": "Mis à jour le {{date}}"
+      "never": "Jamais",
+      "lastUpdated": "Mis à jour le {{date}}",
+      "articlesCount": "{{count}} articles"
+    },
+    "actions": {
+      "adding": "Ajout...",
+      "deleting": "Suppression...",
+      "backToFeeds": "Retour aux flux",
+      "addArticle": "Ajouter un article"
     },
     "messages": {
       "enterValidUrl": "Veuillez entrer une URL valide",
-      "feedDeletedSuccess": "Flux RSS supprimé avec succès !",
-      "feedDeleteError": "Erreur lors de la suppression du flux RSS",
-      "confirmDelete": "Supprimer le flux RSS",
-      "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer ce flux RSS ? Tous les articles associés seront également supprimés. Cette action est irréversible.",
-      "cancel": "Annuler"
+      "feedDeletedSuccess": "Flux supprimé avec succès",
+      "feedDeleteError": "Erreur lors de la suppression du flux",
+      "confirmDelete": "Confirmer la suppression",
+      "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer ce flux RSS ? Cette action est irréversible et supprimera également tous les articles associés."
     }
   },
   "feed": {
     "back": "Retour",
     "update": "Mettre à jour",
-    "stats": {
-      "totalArticles": "Articles totaux",
-      "lastUpdate": "Dernière MAJ",
-      "averageScore": "Score moyen"
-    },
     "recentArticles": "Articles récents",
-    "noArticles": "Aucun article",
-    "noArticlesSubtitle": "Aucun article disponible pour ce flux.",
+    "noArticles": "Aucun article disponible",
+    "noArticlesSubtitle": "Ce flux n'a pas encore d'articles ou ils n'ont pas été récupérés.",
     "fetchArticles": "Récupérer les articles",
     "loadingArticles": "Chargement des articles...",
     "readMore": "Lire plus",
-    "score": "Score: {{score}}%",
     "publishedOn": "Publié le {{date}}",
     "by": "Par {{author}}",
-    "unknownDate": "Date inconnue"
+    "unknownDate": "Date inconnue",
+    "stats": {
+      "totalArticles": "Articles totaux",
+      "lastUpdate": "Dernière mise à jour",
+      "averageScore": "Score moyen"
+    }
   },
   "article": {
     "back": "Retour",
     "article": "Article",
-    "summary": "Résumé",
-    "readingTime": "{{minutes}} min de lecture",
-    "keywords": "Mots-clés",
-    "viewOriginal": "Voir l'article original",
+    "reading": "~5 min de lecture",
     "detailedSummary": "Résumé détaillé",
-    "keyPoints": "Points clés à retenir",
-    "mainContent": "Contenu principal",
-    "reading": "Lecture : 8-10 minutes",
-    "translating": "Traduction en cours...",
-    "translationError": "Erreur de traduction",
-    "noContent": "Aucun contenu disponible",
+    "keyPoints": "Points clés",
+    "viewOriginal": "Voir l'article original",
     "content": {
-      "introduction": "L'intelligence artificielle révolutionne l'oncologie en permettant une détection plus précoce, un diagnostic plus précis et des traitements personnalisés. Cette percée technologique représente un changement de paradigme dans notre approche des soins contre le cancer.",
+      "introduction": "L'intelligence artificielle révolutionne le domaine de l'oncologie en offrant des outils sophistiqués pour améliorer le diagnostic, le traitement et le suivi des patients atteints de cancer. Cette technologie émergente promet de transformer radicalement la prise en charge oncologique.",
       "applications": {
-        "title": "Applications Principales",
+        "title": "Applications en oncologie",
         "diagnosticImaging": {
-          "title": "Imagerie Diagnostique",
-          "description": "Les algorithmes de vision par ordinateur analysent les images médicales (scanners, IRM, radiographies) pour détecter des anomalies invisibles à l'œil nu. Cette technologie est particulièrement efficace pour la détection précoce du cancer du poumon, l'analyse de mammographies pour le cancer du sein et l'examen de biopsies cutanées pour le mélanome."
+          "title": "Imagerie diagnostique",
+          "description": "Les algorithmes d'IA analysent les images médicales avec une précision remarquable, détectant des anomalies subtiles que l'œil humain pourrait manquer. Cette technologie améliore significativement la précocité du diagnostic."
         },
         "personalizedMedicine": {
-          "title": "Médecine Personnalisée",
-          "description": "L'IA permet de personnaliser les traitements en analysant le profil génétique du patient, l'historique médical, les caractéristiques spécifiques de la tumeur et la réponse aux traitements précédents."
+          "title": "Médecine personnalisée",
+          "description": "L'IA permet d'analyser les profils génomiques des tumeurs pour proposer des traitements sur mesure, optimisant ainsi l'efficacité thérapeutique tout en minimisant les effets secondaires."
         }
       },
       "results": {
-        "title": "Résultats Prometteurs",
-        "description": "Des études récentes montrent des résultats encourageants : 30% de réduction des erreurs diagnostiques, 25% d'amélioration du taux de survie à 5 ans, et réduction des effets secondaires grâce aux traitements personnalisés."
+        "title": "Résultats prometteurs",
+        "description": "Les études cliniques montrent une amélioration significative des taux de survie et de la qualité de vie des patients grâce à l'utilisation de l'IA en oncologie. Les algorithmes atteignent des niveaux de précision diagnostique comparables, voire supérieurs, à ceux des spécialistes."
       },
       "challenges": {
-        "title": "Défis et Perspectives",
-        "description": "Malgré ces avancées, plusieurs défis demeurent : l'explicabilité des décisions de l'IA, la validation clinique à grande échelle, l'intégration dans les systèmes hospitaliers existants, et les questions éthiques et réglementaires. L'avenir s'annonce prometteur avec l'émergence de nouvelles techniques comme l'apprentissage fédéré et l'IA multimodale."
+        "title": "Défis et perspectives",
+        "description": "Malgré son potentiel, l'implémentation de l'IA en oncologie fait face à des défis importants : validation clinique rigoureuse, questions éthiques, formation des professionnels de santé et intégration dans les workflows existants."
       }
     },
     "defaultKeywords": {
-      "ai": "Intelligence Artificielle",
+      "ai": "Intelligence artificielle",
       "oncology": "Oncologie",
-      "machinelearning": "Apprentissage Automatique",
-      "deeplearning": "Apprentissage Profond",
+      "machinelearning": "Apprentissage automatique",
+      "research": "Recherche",
+      "cancer": "Cancer",
       "diagnosis": "Diagnostic",
       "treatment": "Traitement",
-      "cancer": "Cancer",
-      "research": "Recherche"
+      "technology": "Technologie",
+      "medical": "Médical",
+      "healthcare": "Santé",
+      "innovation": "Innovation",
+      "precision": "Précision",
+      "therapy": "Thérapie",
+      "clinical": "Clinique",
+      "algorithm": "Algorithme"
     }
   },
-  "about": {
-    "title": "Notre Veille Technologique",
-    "subtitle": "Intelligence Artificielle en Oncologie : Une approche systématique de suivi des innovations révolutionnaires pour MSPR 4",
-    "backToFeeds": "Retour aux Flux RSS",
-    "projectContext": {
-      "title": "Contexte du Projet MSPR 4",
-      "description": "Cette veille technologique est menée dans le cadre de notre projet MSPR 4 (Méthode et Pratique de Situation Professionnelle). Nous sommes 4 développeurs chargés de surveiller et d'analyser les dernières avancées en applications IA pour l'oncologie.",
-      "areas": {
-        "earlyDetection": {
-          "title": "Détection Précoce",
-          "description": "IA pour la détection automatisée de cellules cancéreuses"
-        },
-        "personalizedTreatment": {
-          "title": "Traitement Personnalisé",
-          "description": "Médecine de précision basée sur l'analyse de données"
-        },
-        "acceleratedResearch": {
-          "title": "Recherche Accélérée",
-          "description": "Découverte de médicaments assistée par IA"
-        }
-      }
-    },
-    "team": {
-      "title": "Notre Équipe de Développement",
-      "description": "Une équipe pluridisciplinaire de 4 développeurs couvrant les aspects techniques, médicaux et éthiques :",
-      "expertise": {
-        "technical": "Expertise Technique IA",
-        "medical": "Connaissances Médicales",
-        "regulatory": "Analyse Réglementaire",
-        "competitive": "Intelligence Concurrentielle"
-      }
-    },
-    "methodology": {
-      "title": "Notre Méthodologie",
-      "sources": {
-        "title": "Sources Diversifiées",
-        "items": [
-          "Flux RSS multiples couvrant plusieurs catégories",
-          "Revues scientifiques: Nature, Cell, Science",
-          "Prépublications: arXiv, bioRxiv, medRxiv",
-          "Conférences: MICCAI, ASCO",
-          "Instituts: NIH, INSERM",
-          "Tech News: MIT Tech Review"
-        ]
-      },
-      "analysis": {
-        "title": "Analyse Systématique",
-        "items": [
-          "Surveillance quotidienne des publications",
-          "Filtrage par mots-clés spécialisés",
-          "Classification par impact potentiel",
-          "Réunions de synthèse hebdomadaires",
-          "Alertes technologies révolutionnaires"
-        ]
-      }
-    },
-    "challenges": {
-      "title": "Défis Clés Identifiés",
-      "ethical": {
-        "title": "Enjeux Éthiques",
-        "items": [
-          "Biais algorithmiques",
-          "Transparence des décisions",
-          "Consentement éclairé",
-          "Protection des données"
-        ]
-      },
-      "technical": {
-        "title": "Défis Techniques",
-        "items": [
-          "Qualité des données",
-          "Interopérabilité",
-          "Validation clinique",
-          "Robustesse des modèles"
-        ]
-      },
-      "opportunities": {
-        "title": "Opportunités",
-        "items": [
-          "Diagnostic ultra-précoce",
-          "Médecine personnalisée",
-          "Réduction des coûts",
-          "Accessibilité mondiale"
-        ]
-      }
-    },
-    "trends": {
-      "title": "Tendances Émergentes 2024",
-      "multimodal": {
-        "title": "IA Multimodale",
-        "description": "Intégration d'imagerie médicale, données génomiques et historiques patients pour diagnostic holistique"
-      },
-      "foundation": {
-        "title": "Modèles Fondamentaux",
-        "description": "Modèles pré-entraînés adaptables à différents types de cancer et modalités d'imagerie"
-      },
-      "explainable": {
-        "title": "IA Explicable",
-        "description": "Développement de systèmes transparents pour la confiance des cliniciens et patients"
-      },
-      "edge": {
-        "title": "Edge Computing",
-        "description": "Déploiement d'IA embarquée pour analyse en temps réel lors d'interventions chirurgicales"
-      }
-    },
-    "stats": {
-      "title": "Notre Veille en Chiffres"
-    },
-    "objectives": {
-      "title": "Objectifs d'Apprentissage MSPR 4",
-      "technical": {
-        "title": "Compétences Techniques",
-        "items": [
-          "Collecte et analyse d'informations",
-          "Identification des tendances technologiques",
-          "Évaluation critique des sources",
-          "Synthèse et reporting"
-        ]
-      },
-      "professional": {
-        "title": "Compétences Professionnelles",
-        "items": [
-          "Collaboration en équipe",
-          "Gestion de projet",
-          "Compétences de présentation",
-          "Pensée stratégique"
-        ]
-      }
-    },
-    "cta": "Explorer nos Flux RSS"
-  },
   "standalone": {
-    "title": "Articles Individuels",
-    "noArticles": "Aucun article individuel ajouté",
-    "noArticlesForAdmins": "Utilisez le bouton ci-dessus pour ajouter votre premier article",
-    "noArticlesForUsers": "Seuls les administrateurs et managers peuvent ajouter des articles",
-    "addedOn": "Ajouté le {{date}}",
-    "view": "Voir",
-    "delete": "Supprimer",
-    "confirmDelete": "Supprimer l'article",
-    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.",
-    "deleteSuccess": "Article supprimé avec succès !",
-    "deleteError": "Erreur lors de la suppression de l'article"
-  },
-  "stats": {
-    "feeds": "Sources RSS",
-    "articles": "Articles total",
-    "categories": "Catégories",
-    "developers": "Développeurs",
-    "loading": "Chargement..."
-  },
-  "common": {
-    "loading": "Chargement...",
-    "error": "Erreur",
-    "retry": "Réessayer",
-    "save": "Sauvegarder",
-    "cancel": "Annuler",
-    "delete": "Supprimer",
-    "edit": "Modifier",
-    "close": "Fermer",
-    "open": "Ouvrir",
-    "yes": "Oui",
-    "no": "Non"
+    "title": "Articles individuels",
+    "add": "Ajouter un article",
+    "noArticles": "Aucun article individuel",
+    "noArticlesSubtitle": "Commencez par ajouter votre premier article individuel.",
+    "form": {
+      "title": "Titre",
+      "titlePlaceholder": "Titre de l'article",
+      "url": "URL",
+      "urlPlaceholder": "https://example.com/article",
+      "author": "Auteur",
+      "authorPlaceholder": "Nom de l'auteur",
+      "summary": "Résumé",
+      "summaryPlaceholder": "Résumé de l'article",
+      "keywords": "Mots-clés",
+      "keywordsPlaceholder": "Séparez les mots-clés par des virgules",
+      "category": "Catégorie",
+      "selectCategory": "Sélectionner une catégorie",
+      "relevanceScore": "Score de pertinence"
+    },
+    "messages": {
+      "addSuccess": "Article ajouté avec succès",
+      "addError": "Erreur lors de l'ajout de l'article",
+      "deleteSuccess": "Article supprimé avec succès",
+      "deleteError": "Erreur lors de la suppression de l'article"
+    }
   }
 }
