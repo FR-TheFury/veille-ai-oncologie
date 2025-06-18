@@ -100,9 +100,40 @@
     "keyPoints": "Points clés à retenir",
     "mainContent": "Contenu principal",
     "reading": "Lecture : 8-10 minutes",
+    "translating": "Traduction en cours...",
+    "translationError": "Erreur de traduction",
+    "noContent": "Aucun contenu disponible",
+    "content": {
+      "introduction": "L'intelligence artificielle révolutionne l'oncologie en permettant une détection plus précoce, un diagnostic plus précis et des traitements personnalisés. Cette percée technologique représente un changement de paradigme dans notre approche des soins contre le cancer.",
+      "applications": {
+        "title": "Applications Principales",
+        "diagnosticImaging": {
+          "title": "Imagerie Diagnostique",
+          "description": "Les algorithmes de vision par ordinateur analysent les images médicales (scanners, IRM, radiographies) pour détecter des anomalies invisibles à l'œil nu. Cette technologie est particulièrement efficace pour la détection précoce du cancer du poumon, l'analyse de mammographies pour le cancer du sein et l'examen de biopsies cutanées pour le mélanome."
+        },
+        "personalizedMedicine": {
+          "title": "Médecine Personnalisée",
+          "description": "L'IA permet de personnaliser les traitements en analysant le profil génétique du patient, l'historique médical, les caractéristiques spécifiques de la tumeur et la réponse aux traitements précédents."
+        }
+      },
+      "results": {
+        "title": "Résultats Prometteurs",
+        "description": "Des études récentes montrent des résultats encourageants : 30% de réduction des erreurs diagnostiques, 25% d'amélioration du taux de survie à 5 ans, et réduction des effets secondaires grâce aux traitements personnalisés."
+      },
+      "challenges": {
+        "title": "Défis et Perspectives",
+        "description": "Malgré ces avancées, plusieurs défis demeurent : l'explicabilité des décisions de l'IA, la validation clinique à grande échelle, l'intégration dans les systèmes hospitaliers existants, et les questions éthiques et réglementaires. L'avenir s'annonce prometteur avec l'émergence de nouvelles techniques comme l'apprentissage fédéré et l'IA multimodale."
+      }
+    },
     "defaultKeywords": {
       "ai": "Intelligence Artificielle",
-      "oncology": "Oncologie"
+      "oncology": "Oncologie",
+      "machinelearning": "Apprentissage Automatique",
+      "deeplearning": "Apprentissage Profond",
+      "diagnosis": "Diagnostic",
+      "treatment": "Traitement",
+      "cancer": "Cancer",
+      "research": "Recherche"
     }
   },
   "about": {
@@ -236,6 +267,19 @@
     },
     "cta": "Explorer nos Flux RSS"
   },
+  "standalone": {
+    "title": "Articles Individuels",
+    "noArticles": "Aucun article individuel ajouté",
+    "noArticlesForAdmins": "Utilisez le bouton ci-dessus pour ajouter votre premier article",
+    "noArticlesForUsers": "Seuls les administrateurs et managers peuvent ajouter des articles",
+    "addedOn": "Ajouté le {date}",
+    "view": "Voir",
+    "delete": "Supprimer",
+    "confirmDelete": "Supprimer l'article",
+    "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.",
+    "deleteSuccess": "Article supprimé avec succès !",
+    "deleteError": "Erreur lors de la suppression de l'article"
+  },
   "stats": {
     "feeds": "Sources RSS",
     "articles": "Articles total",
@@ -252,6 +296,8 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "close": "Fermer",
-    "open": "Ouvrir"
+    "open": "Ouvrir",
+    "yes": "Oui",
+    "no": "Non"
   }
 }

@@ -19,84 +19,90 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
   // Déterminer la locale pour date-fns selon la langue actuelle
   const dateLocale = i18n.language === 'fr' ? fr : enUS;
 
-  // Contenu par défaut d'exemple pour l'article en fonction de la langue
-  const getDefaultContent = () => {
-    if (i18n.language === 'fr') {
-      return `
-L'intelligence artificielle révolutionne le domaine de l'oncologie de manière spectaculaire. Les récentes avancées en apprentissage profond permettent aux médecins de diagnostiquer certains types de cancer avec une précision qui dépasse parfois celle des experts humains.
+  // Fonction pour traduire le contenu selon la langue
+  const getTranslatedContent = () => {
+    const currentLang = i18n.language;
+    
+    // Structure du contenu traduit
+    const translatedContent = {
+      fr: {
+        introduction: t('article.content.introduction'),
+        applications: {
+          title: t('article.content.applications.title'),
+          diagnosticImaging: {
+            title: t('article.content.applications.diagnosticImaging.title'),
+            description: t('article.content.applications.diagnosticImaging.description')
+          },
+          personalizedMedicine: {
+            title: t('article.content.applications.personalizedMedicine.title'),
+            description: t('article.content.applications.personalizedMedicine.description')
+          }
+        },
+        results: {
+          title: t('article.content.results.title'),
+          description: t('article.content.results.description')
+        },
+        challenges: {
+          title: t('article.content.challenges.title'),
+          description: t('article.content.challenges.description')
+        }
+      },
+      en: {
+        introduction: t('article.content.introduction'),
+        applications: {
+          title: t('article.content.applications.title'),
+          diagnosticImaging: {
+            title: t('article.content.applications.diagnosticImaging.title'),
+            description: t('article.content.applications.diagnosticImaging.description')
+          },
+          personalizedMedicine: {
+            title: t('article.content.applications.personalizedMedicine.title'),
+            description: t('article.content.applications.personalizedMedicine.description')
+          }
+        },
+        results: {
+          title: t('article.content.results.title'),
+          description: t('article.content.results.description')
+        },
+        challenges: {
+          title: t('article.content.challenges.title'),
+          description: t('article.content.challenges.description')
+        }
+      }
+    };
 
-## Applications Principales
-
-### Imagerie Diagnostique
-Les algorithmes de vision par ordinateur analysent les images médicales (scanners, IRM, radiographies) pour détecter des anomalies invisibles à l'œil nu. Cette technologie est particulièrement efficace pour :
-- La détection précoce du cancer du poumon
-- L'analyse de mammographies pour le cancer du sein
-- L'examen de biopsies cutanées pour le mélanome
-
-### Médecine Personnalisée
-L'IA permet de personnaliser les traitements en analysant :
-- Le profil génétique du patient
-- L'historique médical
-- Les caractéristiques spécifiques de la tumeur
-- La réponse aux traitements précédents
-
-## Résultats Prometteurs
-
-Des études récentes montrent des résultats encourageants :
-- 30% de réduction des erreurs diagnostiques
-- 25% d'amélioration du taux de survie à 5 ans
-- Réduction des effets secondaires grâce aux traitements personnalisés
-
-## Défis et Perspectives
-
-Malgré ces avancées, plusieurs défis demeurent :
-- L'explicabilité des décisions de l'IA
-- La validation clinique à grande échelle
-- L'intégration dans les systèmes hospitaliers existants
-- Les questions éthiques et réglementaires
-
-L'avenir s'annonce prometteur avec l'émergence de nouvelles techniques comme l'apprentissage fédéré et l'IA multimodale, qui pourront analyser simultanément différents types de données médicales.
-      `;
-    } else {
-      return `
-Artificial intelligence is revolutionizing the field of oncology in spectacular ways. Recent advances in deep learning allow doctors to diagnose certain types of cancer with accuracy that sometimes exceeds that of human experts.
-
-## Main Applications
-
-### Diagnostic Imaging
-Computer vision algorithms analyze medical images (scans, MRIs, X-rays) to detect anomalies invisible to the naked eye. This technology is particularly effective for:
-- Early lung cancer detection
-- Mammography analysis for breast cancer
-- Skin biopsy examination for melanoma
-
-### Personalized Medicine
-AI enables treatment personalization by analyzing:
-- Patient genetic profile
-- Medical history
-- Specific tumor characteristics
-- Response to previous treatments
-
-## Promising Results
-
-Recent studies show encouraging results:
-- 30% reduction in diagnostic errors
-- 25% improvement in 5-year survival rate
-- Reduction of side effects through personalized treatments
-
-## Challenges and Perspectives
-
-Despite these advances, several challenges remain:
-- Explainability of AI decisions
-- Large-scale clinical validation
-- Integration into existing hospital systems
-- Ethical and regulatory questions
-
-The future looks promising with the emergence of new techniques like federated learning and multimodal AI, which will be able to simultaneously analyze different types of medical data.
-      `;
-    }
+    return translatedContent[currentLang as keyof typeof translatedContent] || translatedContent.en;
   };
 
-  const fullContent = getDefaultContent();
+  // Fonction pour traduire les mots-clés
+  const getTranslatedKeywords = () => {
+    if (!article.keywords || article.keywords.length === 0) {
+      return [
+        t('article.defaultKeywords.ai'),
+        t('article.defaultKeywords.oncology'),
+        t('article.defaultKeywords.machinelearning'),
+        t('article.defaultKeywords.research')
+      ];
+    }
+
+    // Traduire les mots-clés connus
+    return article.keywords.map(keyword => {
+      const lowercaseKeyword = keyword.toLowerCase();
+      const translationKey = `article.defaultKeywords.${lowercaseKeyword}`;
+      const translated = t(translationKey);
+      
+      // Si la traduction existe et est différente de la clé, l'utiliser
+      if (translated !== translationKey) {
+        return translated;
+      }
+      
+      // Sinon, garder le mot-clé original
+      return keyword;
+    });
+  };
+
+  const content = getTranslatedContent();
+  const translatedKeywords = getTranslatedKeywords();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -172,100 +178,71 @@ The future looks promising with the emergence of new techniques like federated l
             </div>
           )}
 
-          {/* Main content */}
+          {/* Main content - Translated */}
           <div className="prose max-w-none">
-            <div className="whitespace-pre-wrap text-foreground leading-relaxed">
-              {article.content ? (
-                article.content.split('\n').map((paragraph, index) => {
-                  if (paragraph.trim() === '') return <br key={index} />;
-                  
-                  if (paragraph.startsWith('## ')) {
-                    return (
-                      <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
-                        {paragraph.replace('## ', '')}
-                      </h2>
-                    );
-                  }
-                  
-                  if (paragraph.startsWith('### ')) {
-                    return (
-                      <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
-                        {paragraph.replace('### ', '')}
-                      </h3>
-                    );
-                  }
-                  
-                  if (paragraph.trim().startsWith('- ')) {
-                    return (
-                      <li key={index} className="text-muted-foreground ml-4 mb-1">
-                        {paragraph.replace('- ', '')}
-                      </li>
-                    );
-                  }
-                  
-                  return (
-                    <p key={index} className="text-foreground mb-4 leading-relaxed">
-                      {paragraph}
+            <div className="text-foreground leading-relaxed space-y-6">
+              {/* Introduction */}
+              <p className="text-lg leading-relaxed">
+                {content.introduction}
+              </p>
+
+              {/* Applications */}
+              <div>
+                <h2 className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
+                  {content.applications.title}
+                </h2>
+                
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">
+                      {content.applications.diagnosticImaging.title}
+                    </h3>
+                    <p className="text-foreground mb-4 leading-relaxed">
+                      {content.applications.diagnosticImaging.description}
                     </p>
-                  );
-                })
-              ) : (
-                fullContent.split('\n').map((paragraph, index) => {
-                  if (paragraph.trim() === '') return <br key={index} />;
-                  
-                  if (paragraph.startsWith('## ')) {
-                    return (
-                      <h2 key={index} className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
-                        {paragraph.replace('## ', '')}
-                      </h2>
-                    );
-                  }
-                  
-                  if (paragraph.startsWith('### ')) {
-                    return (
-                      <h3 key={index} className="text-lg font-semibold text-foreground mt-6 mb-3">
-                        {paragraph.replace('### ', '')}
-                      </h3>
-                    );
-                  }
-                  
-                  if (paragraph.trim().startsWith('- ')) {
-                    return (
-                      <li key={index} className="text-muted-foreground ml-4 mb-1">
-                        {paragraph.replace('- ', '')}
-                      </li>
-                    );
-                  }
-                  
-                  return (
-                    <p key={index} className="text-foreground mb-4 leading-relaxed">
-                      {paragraph}
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">
+                      {content.applications.personalizedMedicine.title}
+                    </h3>
+                    <p className="text-foreground mb-4 leading-relaxed">
+                      {content.applications.personalizedMedicine.description}
                     </p>
-                  );
-                })
-              )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Results */}
+              <div>
+                <h2 className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
+                  {content.results.title}
+                </h2>
+                <p className="text-foreground mb-4 leading-relaxed">
+                  {content.results.description}
+                </p>
+              </div>
+
+              {/* Challenges */}
+              <div>
+                <h2 className="text-xl font-bold text-foreground mt-8 mb-4 border-b border-gray-200 pb-2">
+                  {content.challenges.title}
+                </h2>
+                <p className="text-foreground mb-4 leading-relaxed">
+                  {content.challenges.description}
+                </p>
+              </div>
             </div>
           </div>
 
           {/* Actions */}
           <div className="flex items-center justify-between mt-8 pt-6 border-t border-gray-200">
             <div className="flex items-center space-x-2">
-              {article.keywords && article.keywords.length > 0 ? (
-                article.keywords.slice(0, 3).map((keyword, index) => (
-                  <Badge key={index} className="bg-green-100 text-green-800 border-green-200">
-                    {keyword}
-                  </Badge>
-                ))
-              ) : (
-                <>
-                  <Badge className="bg-green-100 text-green-800 border-green-200">
-                    {t('article.defaultKeywords.ai')}
-                  </Badge>
-                  <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                    {t('article.defaultKeywords.oncology')}
-                  </Badge>
-                </>
-              )}
+              {translatedKeywords.slice(0, 4).map((keyword, index) => (
+                <Badge key={index} className="bg-green-100 text-green-800 border-green-200">
+                  {keyword}
+                </Badge>
+              ))}
             </div>
             
             <Button 

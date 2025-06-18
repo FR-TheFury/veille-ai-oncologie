@@ -6,9 +6,10 @@ import { Badge } from '@/components/ui/badge';
 import { ExternalLink, Trash2, Calendar, User, FileText, Sparkles, Eye } from 'lucide-react';
 import { useStandaloneArticles, useDeleteStandaloneArticle } from '@/hooks/useStandaloneArticles';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
 import ArticleDetail from './ArticleDetail';
 import { useAuth } from '@/contexts/AuthContext';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,6 +27,10 @@ export function StandaloneArticlesList() {
   const [articleToDelete, setArticleToDelete] = useState<string | null>(null);
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const { canManageContent } = useAuth();
+  const { t, i18n } = useTranslation();
+
+  // Déterminer la locale pour date-fns selon la langue actuelle
+  const dateLocale = i18n.language === 'fr' ? fr : enUS;
 
   const handleDelete = async () => {
     if (articleToDelete) {
@@ -85,14 +90,14 @@ export function StandaloneArticlesList() {
         <CardContent className="pt-6">
           <div className="text-center">
             <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 mb-2">Aucun article individuel ajouté</p>
+            <p className="text-gray-500 mb-2">{t('standalone.noArticles')}</p>
             {canManageContent() ? (
               <p className="text-sm text-gray-400">
-                Utilisez le bouton ci-dessus pour ajouter votre premier article
+                {t('standalone.noArticlesForAdmins')}
               </p>
             ) : (
               <p className="text-sm text-gray-400">
-                Seuls les administrateurs et managers peuvent ajouter des articles
+                {t('standalone.noArticlesForUsers')}
               </p>
             )}
           </div>
@@ -178,7 +183,7 @@ export function StandaloneArticlesList() {
                   {article.published_at && (
                     <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
                       <Calendar className="h-3 w-3" />
-                      <span>{format(new Date(article.published_at), 'dd MMM yyyy', { locale: fr })}</span>
+                      <span>{format(new Date(article.published_at), 'dd MMM yyyy', { locale: dateLocale })}</span>
                     </div>
                   )}
                   
@@ -212,7 +217,9 @@ export function StandaloneArticlesList() {
                 )}
                 
                 <div className="text-xs text-gray-500 bg-white/30 px-2 py-1 rounded">
-                  ✨ Ajouté le {format(new Date(article.created_at), 'dd MMM yyyy à HH:mm', { locale: fr })}
+                  ✨ {t('standalone.addedOn', {
+                    date: format(new Date(article.created_at), 'dd MMM yyyy à HH:mm', { locale: dateLocale })
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -223,18 +230,18 @@ export function StandaloneArticlesList() {
       <AlertDialog open={!!articleToDelete} onOpenChange={() => setArticleToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Supprimer l'article</AlertDialogTitle>
+            <AlertDialogTitle>{t('standalone.confirmDelete')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.
+              {t('standalone.confirmDeleteMessage')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction 
               onClick={handleDelete}
               className="bg-red-600 hover:bg-red-700"
             >
-              Supprimer
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
