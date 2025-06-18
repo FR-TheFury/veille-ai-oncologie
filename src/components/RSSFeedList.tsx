@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Plus, RefreshCw, Trash2, ExternalLink, Calendar, User, BookOpen, Eye, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,11 +24,13 @@ import FeedDetail from '@/components/FeedDetail';
 import ArticleDetail from '@/components/ArticleDetail';
 import { useAuth } from '@/contexts/AuthContext';
 import { format } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS } from 'date-fns/locale';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
 import type { Feed } from '@/hooks/useRSSFeeds';
 
 export function RSSFeedList() {
+  const { t, i18n } = useTranslation();
   const [newFeedUrl, setNewFeedUrl] = useState('');
   const [feedToDelete, setFeedToDelete] = useState<string | null>(null);
   const [selectedFeed, setSelectedFeed] = useState<Feed | null>(null);
@@ -42,6 +45,9 @@ export function RSSFeedList() {
   const deleteFeedMutation = useDeleteRSSFeed();
   const fetchArticlesMutation = useFetchArticles();
   const { user, canManageContent } = useAuth();
+
+  // Déterminer la locale pour date-fns selon la langue actuelle
+  const dateLocale = i18n.language === 'fr' ? fr : enUS;
 
   console.log('🔍 Debug auth state:', { user: !!user, canManage: canManageContent() });
 
@@ -81,9 +87,9 @@ export function RSSFeedList() {
               onClick={() => setShowStandaloneArticles(false)}
               className="hover:bg-gray-50"
             >
-              ← Retour aux flux RSS
+              ← {t('rss.actions.backToFeeds')}
             </Button>
-            <h2 className="text-2xl font-bold">Articles individuels</h2>
+            <h2 className="text-2xl font-bold">{t('rss.actions.standaloneArticles')}</h2>
           </div>
           {canManageContent() && (
             <Button
@@ -91,7 +97,7 @@ export function RSSFeedList() {
               className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter un article
+              {t('rss.actions.addArticle')}
             </Button>
           )}
         </div>
@@ -106,7 +112,7 @@ export function RSSFeedList() {
 
   const handleAddFeed = async () => {
     if (!newFeedUrl.trim()) {
-      toast.error('Veuillez entrer une URL valide');
+      toast.error(t('rss.messages.enterValidUrl'));
       return;
     }
 
@@ -126,10 +132,10 @@ export function RSSFeedList() {
     try {
       await deleteFeedMutation.mutateAsync(feedToDelete);
       setFeedToDelete(null);
-      toast.success('Flux RSS supprimé avec succès !');
+      toast.success(t('rss.messages.feedDeletedSuccess'));
     } catch (error) {
       console.error('❌ Error deleting feed:', error);
-      toast.error('Erreur lors de la suppression du flux RSS');
+      toast.error(t('rss.messages.feedDeleteError'));
     }
   };
 
@@ -152,10 +158,10 @@ export function RSSFeedList() {
         {/* Header avec statistiques */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Veille Technologique IA & Oncologie
+            {t('rss.mainTitle')}
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Restez informé des dernières avancées en intelligence artificielle appliquée à l'oncologie
+            {t('rss.mainSubtitle')}
           </p>
           
           {/* Statistiques rapides */}
@@ -163,19 +169,19 @@ export function RSSFeedList() {
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-blue-600">{rssFeeds?.length || 0}</div>
-                <div className="text-sm text-blue-700">Flux RSS</div>
+                <div className="text-sm text-blue-700">{t('rss.stats.feeds')}</div>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-purple-600">{standaloneArticles?.length || 0}</div>
-                <div className="text-sm text-purple-700">Articles individuels</div>
+                <div className="text-sm text-purple-700">{t('rss.stats.standaloneArticles')}</div>
               </CardContent>
             </Card>
             <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-green-600">{allArticles?.length || 0}</div>
-                <div className="text-sm text-green-700">Articles total</div>
+                <div className="text-sm text-green-700">{t('rss.stats.totalArticles')}</div>
               </CardContent>
             </Card>
           </div>
@@ -186,7 +192,7 @@ export function RSSFeedList() {
           {canManageContent() && (
             <div className="flex gap-2">
               <Input
-                placeholder="URL du flux RSS..."
+                placeholder={t('rss.addPlaceholder')}
                 value={newFeedUrl}
                 onChange={(e) => setNewFeedUrl(e.target.value)}
                 className="min-w-80"
@@ -198,7 +204,7 @@ export function RSSFeedList() {
                 className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
               >
                 <Plus className="h-4 w-4 mr-2" />
-                {addFeedMutation.isPending ? 'Ajout...' : 'Ajouter'}
+                {addFeedMutation.isPending ? t('rss.actions.adding') : t('rss.addFeed')}
               </Button>
             </div>
           )}
@@ -208,13 +214,13 @@ export function RSSFeedList() {
             className="hover:bg-purple-50 border-purple-200"
           >
             <BookOpen className="h-4 w-4 mr-2" />
-            Articles individuels ({standaloneArticles?.length || 0})
+            {t('rss.actions.standaloneArticles')} ({standaloneArticles?.length || 0})
           </Button>
         </div>
 
         {/* Liste des flux RSS */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-center">Flux RSS</h2>
+          <h2 className="text-2xl font-bold text-center">{t('rss.stats.feeds')}</h2>
           
           {isLoadingFeeds ? (
             <div className="space-y-4">
@@ -237,14 +243,14 @@ export function RSSFeedList() {
               <CardContent className="pt-6">
                 <div className="text-center">
                   <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-2">Aucun flux RSS configuré</p>
+                  <p className="text-gray-500 mb-2">{t('rss.noFeeds')}</p>
                   {canManageContent() ? (
                     <p className="text-sm text-gray-400">
-                      Ajoutez votre premier flux RSS ci-dessus pour commencer
+                      {t('rss.noFeedsForAdmins')}
                     </p>
                   ) : (
                     <p className="text-sm text-gray-400">
-                      Seuls les administrateurs et managers peuvent ajouter des flux
+                      {t('rss.noFeedsForUsers')}
                     </p>
                   )}
                 </div>
@@ -336,19 +342,27 @@ export function RSSFeedList() {
                       <div className="flex flex-wrap gap-3 items-center text-sm">
                         <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
                           <BookOpen className="h-3 w-3" />
-                          <span className="font-medium">{feed.article_count || 0} articles</span>
+                          <span className="font-medium">
+                            {t('rss.status.articlesCount', { count: feed.article_count || 0 })}
+                          </span>
                         </div>
                         
                         {feed.last_fetched_at && (
                           <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
                             <Calendar className="h-3 w-3" />
-                            <span>Mis à jour le {format(new Date(feed.last_fetched_at), 'dd MMM yyyy', { locale: fr })}</span>
+                            <span>
+                              {t('rss.status.updatedOn', { 
+                                date: format(new Date(feed.last_fetched_at), 'dd MMM yyyy', { locale: dateLocale }) 
+                              })}
+                            </span>
                           </div>
                         )}
                         
                         <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
                           <div className={`h-2 w-2 rounded-full ${feed.status === 'active' ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                          <span className="capitalize">{feed.status}</span>
+                          <span className="capitalize">
+                            {feed.status === 'active' ? t('rss.status.active') : t('rss.status.inactive')}
+                          </span>
                         </div>
                         
                         {feed.categories && (
@@ -387,7 +401,7 @@ export function RSSFeedList() {
         {/* Articles récents */}
         {allArticles && allArticles.length > 0 && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-center">Articles récents</h2>
+            <h2 className="text-2xl font-bold text-center">{t('feed.recentArticles')}</h2>
             <div className="grid gap-4">
               {allArticles.slice(0, 6).map((article) => (
                 <Card key={article.id} className="hover:shadow-md transition-all duration-300">
@@ -408,12 +422,12 @@ export function RSSFeedList() {
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
                             <span>
-                              {format(new Date(article.published_at || article.created_at), 'dd MMM yyyy', { locale: fr })}
+                              {format(new Date(article.published_at || article.created_at), 'dd MMM yyyy', { locale: dateLocale })}
                             </span>
                           </div>
                           {article.source_type && (
                             <Badge variant="outline" className="text-xs">
-                              {article.source_type === 'rss' ? 'RSS' : 'Article individuel'}
+                              {article.source_type === 'rss' ? 'RSS' : t('rss.stats.standaloneArticles')}
                             </Badge>
                           )}
                         </div>
@@ -437,19 +451,19 @@ export function RSSFeedList() {
         <AlertDialog open={!!feedToDelete} onOpenChange={() => setFeedToDelete(null)}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Supprimer le flux RSS</AlertDialogTitle>
+              <AlertDialogTitle>{t('rss.messages.confirmDelete')}</AlertDialogTitle>
               <AlertDialogDescription>
-                Êtes-vous sûr de vouloir supprimer ce flux RSS ? Tous les articles associés seront également supprimés. Cette action est irréversible.
+                {t('rss.messages.confirmDeleteMessage')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>Annuler</AlertDialogCancel>
+              <AlertDialogCancel>{t('rss.messages.cancel')}</AlertDialogCancel>
               <AlertDialogAction 
                 onClick={handleDelete}
                 className="bg-red-600 hover:bg-red-700"
                 disabled={deleteFeedMutation.isPending}
               >
-                {deleteFeedMutation.isPending ? 'Suppression...' : 'Supprimer'}
+                {deleteFeedMutation.isPending ? t('rss.actions.deleting') : t('common.delete')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

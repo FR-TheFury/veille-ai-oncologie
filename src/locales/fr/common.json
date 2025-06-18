@@ -1,19 +1,33 @@
 
 {
   "header": {
-    "title": "AI Veille Tech",
+    "title": "OncIA Veille",
     "subtitle": "Veille Technologique IA",
     "rssFeeds": "Flux RSS",
-    "about": "À propos"
+    "about": "À propos",
+    "searchPlaceholder": "Rechercher articles, technologies, chercheurs...",
+    "signIn": "Se connecter",
+    "notifications": {
+      "title": "Notifications",
+      "empty": "Aucune notification",
+      "newArticles": "Nouveaux articles disponibles",
+      "feedUpdated": "Flux RSS mis à jour",
+      "twoHoursAgo": "Il y a 2h",
+      "fiveHoursAgo": "Il y a 5h"
+    }
   },
   "rss": {
     "title": "Flux RSS - IA & Oncologie",
     "subtitle": "Suivez {count} sources spécialisées pour votre veille technologique",
+    "mainTitle": "Veille Technologique IA & Oncologie",
+    "mainSubtitle": "Restez informé des dernières avancées en intelligence artificielle appliquée à l'oncologie",
     "addFeed": "Ajouter",
     "addPlaceholder": "URL du flux RSS...",
     "loading": "Chargement des flux RSS...",
     "noFeeds": "Aucun flux RSS",
     "noFeedsSubtitle": "Ajoutez votre premier flux RSS pour commencer votre veille.",
+    "noFeedsForAdmins": "Ajoutez votre premier flux RSS ci-dessus pour commencer",
+    "noFeedsForUsers": "Seuls les administrateurs et managers peuvent ajouter des flux",
     "categories": {
       "all": "Tous"
     },
@@ -21,21 +35,39 @@
       "feeds": "Flux RSS",
       "articles": "Articles",
       "categories": "Catégories",
-      "displayed": "Affichés"
+      "displayed": "Affichés",
+      "standaloneArticles": "Articles individuels",
+      "totalArticles": "Articles total"
     },
     "actions": {
       "update": "MAJ",
       "details": "Détails",
       "view": "Voir",
       "viewArticles": "Voir les articles",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "adding": "Ajout...",
+      "deleting": "Suppression...",
+      "backToFeeds": "Retour aux flux RSS",
+      "addArticle": "Ajouter un article",
+      "standaloneArticles": "Articles individuels"
     },
     "status": {
       "error": "Erreur",
       "uncategorized": "Non catégorisé",
       "lastUpdated": "Mis à jour: {date}",
       "never": "Jamais",
-      "articlesCount": "{count} articles"
+      "articlesCount": "{count} articles",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "updatedOn": "Mis à jour le {date}"
+    },
+    "messages": {
+      "enterValidUrl": "Veuillez entrer une URL valide",
+      "feedDeletedSuccess": "Flux RSS supprimé avec succès !",
+      "feedDeleteError": "Erreur lors de la suppression du flux RSS",
+      "confirmDelete": "Supprimer le flux RSS",
+      "confirmDeleteMessage": "Êtes-vous sûr de vouloir supprimer ce flux RSS ? Tous les articles associés seront également supprimés. Cette action est irréversible.",
+      "cancel": "Annuler"
     }
   },
   "feed": {
@@ -53,7 +85,7 @@
     "loadingArticles": "Chargement des articles...",
     "readMore": "Lire plus",
     "score": "Score: {score}%",
-    "publishedOn": "{date}",
+    "publishedOn": "Publié le {date}",
     "by": "Par {author}",
     "unknownDate": "Date inconnue"
   },
@@ -64,6 +96,10 @@
     "readingTime": "{minutes} min de lecture",
     "keywords": "Mots-clés",
     "viewOriginal": "Voir l'article original",
+    "detailedSummary": "Résumé détaillé",
+    "keyPoints": "Points clés à retenir",
+    "mainContent": "Contenu principal",
+    "reading": "Lecture : 8-10 minutes",
     "defaultKeywords": {
       "ai": "Intelligence Artificielle",
       "oncology": "Oncologie"

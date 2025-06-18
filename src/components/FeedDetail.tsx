@@ -7,6 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import ArticleDetail from './ArticleDetail';
 import { useArticles, useFetchArticles } from '@/hooks/useRSSFeeds';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
 import type { Feed } from '@/hooks/useRSSFeeds';
 
 interface FeedDetailProps {
@@ -15,10 +17,13 @@ interface FeedDetailProps {
 }
 
 const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [selectedArticleId, setSelectedArticleId] = useState<string | null>(null);
   const { data: articles = [], isLoading } = useArticles(feed.id);
   const fetchArticlesMutation = useFetchArticles();
+
+  // Déterminer la locale pour date-fns selon la langue actuelle
+  const dateLocale = i18n.language === 'fr' ? fr : enUS;
 
   const handleRefreshFeed = async () => {
     try {
@@ -86,7 +91,10 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
               <div>
                 <p className="text-sm text-green-600 font-medium">{t('feed.stats.lastUpdate')}</p>
                 <p className="text-lg font-bold text-green-700">
-                  {feed.last_fetched_at ? new Date(feed.last_fetched_at).toLocaleDateString() : t('rss.status.never')}
+                  {feed.last_fetched_at ? 
+                    format(new Date(feed.last_fetched_at), 'PPP', { locale: dateLocale }) : 
+                    t('rss.status.never')
+                  }
                 </p>
               </div>
               <Calendar className="w-8 h-8 text-green-500" />
@@ -169,10 +177,14 @@ const FeedDetail = ({ feed, onBack }: FeedDetailProps) => {
                     <div className="flex items-center space-x-4 text-sm text-muted-foreground">
                       <span className="flex items-center">
                         <Calendar className="w-3 h-3 mr-1" />
-                        Publié le {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
+                        {t('feed.publishedOn', {
+                          date: article.published_at ? 
+                            format(new Date(article.published_at), 'PPP', { locale: dateLocale }) : 
+                            t('feed.unknownDate')
+                        })}
                       </span>
                       {article.author && (
-                        <span>par {article.author}</span>
+                        <span>{t('feed.by', { author: article.author })}</span>
                       )}
                     </div>
                     <div className="flex items-center space-x-2">

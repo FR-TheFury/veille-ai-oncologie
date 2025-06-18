@@ -1,19 +1,33 @@
 
 {
   "header": {
-    "title": "AI Tech Watch",
+    "title": "OncIA Watch",
     "subtitle": "AI Technology Watch",
     "rssFeeds": "RSS Feeds",
-    "about": "About"
+    "about": "About",
+    "searchPlaceholder": "Search articles, technologies, researchers...",
+    "signIn": "Sign In",
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No notifications",
+      "newArticles": "New articles available",
+      "feedUpdated": "RSS feed updated",
+      "twoHoursAgo": "2 hours ago",
+      "fiveHoursAgo": "5 hours ago"
+    }
   },
   "rss": {
     "title": "RSS Feeds - AI & Oncology",
     "subtitle": "Follow {count} specialized sources for your technology watch",
+    "mainTitle": "AI Technology Watch & Oncology",
+    "mainSubtitle": "Stay informed about the latest advances in artificial intelligence applied to oncology",
     "addFeed": "Add",
     "addPlaceholder": "RSS feed URL...",
     "loading": "Loading RSS feeds...",
     "noFeeds": "No RSS feeds",
     "noFeedsSubtitle": "Add your first RSS feed to start your watch.",
+    "noFeedsForAdmins": "Add your first RSS feed above to get started",
+    "noFeedsForUsers": "Only administrators and managers can add feeds",
     "categories": {
       "all": "All"
     },
@@ -21,21 +35,39 @@
       "feeds": "RSS Feeds",
       "articles": "Articles",
       "categories": "Categories",
-      "displayed": "Displayed"
+      "displayed": "Displayed",
+      "standaloneArticles": "Standalone Articles",
+      "totalArticles": "Total Articles"
     },
     "actions": {
       "update": "Update",
       "details": "Details",
       "view": "View",
       "viewArticles": "View articles",
-      "delete": "Delete"
+      "delete": "Delete",
+      "adding": "Adding...",
+      "deleting": "Deleting...",
+      "backToFeeds": "Back to RSS Feeds",
+      "addArticle": "Add Article",
+      "standaloneArticles": "Standalone articles"
     },
     "status": {
       "error": "Error",
       "uncategorized": "Uncategorized",
       "lastUpdated": "Updated: {date}",
       "never": "Never",
-      "articlesCount": "{count} articles"
+      "articlesCount": "{count} articles",
+      "active": "Active",
+      "inactive": "Inactive",
+      "updatedOn": "Updated on {date}"
+    },
+    "messages": {
+      "enterValidUrl": "Please enter a valid URL",
+      "feedDeletedSuccess": "RSS feed deleted successfully!",
+      "feedDeleteError": "Error deleting RSS feed",
+      "confirmDelete": "Delete RSS feed",
+      "confirmDeleteMessage": "Are you sure you want to delete this RSS feed? All associated articles will also be deleted. This action is irreversible.",
+      "cancel": "Cancel"
     }
   },
   "feed": {
@@ -53,7 +85,7 @@
     "loadingArticles": "Loading articles...",
     "readMore": "Read more",
     "score": "Score: {score}%",
-    "publishedOn": "{date}",
+    "publishedOn": "Published on {date}",
     "by": "By {author}",
     "unknownDate": "Unknown date"
   },
@@ -64,6 +96,10 @@
     "readingTime": "{minutes} min read",
     "keywords": "Keywords",
     "viewOriginal": "View original article",
+    "detailedSummary": "Detailed Summary",
+    "keyPoints": "Key Points to Remember",
+    "mainContent": "Main Content",
+    "reading": "Reading: 8-10 minutes",
     "defaultKeywords": {
       "ai": "Artificial Intelligence",
       "oncology": "Oncology"

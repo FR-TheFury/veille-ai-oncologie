@@ -1,8 +1,11 @@
+
 import { ArrowLeft, Calendar, Clock, ExternalLink, User, BookOpen, Lightbulb } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useTranslation } from 'react-i18next';
+import { format } from 'date-fns';
+import { fr, enUS } from 'date-fns/locale';
 import type { Article } from '@/hooks/useRSSFeeds';
 
 interface ArticleDetailProps {
@@ -11,44 +14,89 @@ interface ArticleDetailProps {
 }
 
 const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
-  // Sample content for the article
-  const fullContent = `
-    Artificial intelligence is revolutionizing the field of oncology in spectacular ways. Recent advances in deep learning allow doctors to diagnose certain types of cancer with accuracy that sometimes exceeds that of human experts.
+  // Déterminer la locale pour date-fns selon la langue actuelle
+  const dateLocale = i18n.language === 'fr' ? fr : enUS;
 
-    ## Main Applications
+  // Contenu par défaut d'exemple pour l'article en fonction de la langue
+  const getDefaultContent = () => {
+    if (i18n.language === 'fr') {
+      return `
+L'intelligence artificielle révolutionne le domaine de l'oncologie de manière spectaculaire. Les récentes avancées en apprentissage profond permettent aux médecins de diagnostiquer certains types de cancer avec une précision qui dépasse parfois celle des experts humains.
 
-    ### Diagnostic Imaging
-    Computer vision algorithms analyze medical images (scans, MRIs, X-rays) to detect anomalies invisible to the naked eye. This technology is particularly effective for:
-    - Early lung cancer detection
-    - Mammography analysis for breast cancer
-    - Skin biopsy examination for melanoma
+## Applications Principales
 
-    ### Personalized Medicine
-    AI enables treatment personalization by analyzing:
-    - Patient genetic profile
-    - Medical history
-    - Specific tumor characteristics
-    - Response to previous treatments
+### Imagerie Diagnostique
+Les algorithmes de vision par ordinateur analysent les images médicales (scanners, IRM, radiographies) pour détecter des anomalies invisibles à l'œil nu. Cette technologie est particulièrement efficace pour :
+- La détection précoce du cancer du poumon
+- L'analyse de mammographies pour le cancer du sein
+- L'examen de biopsies cutanées pour le mélanome
 
-    ## Promising Results
+### Médecine Personnalisée
+L'IA permet de personnaliser les traitements en analysant :
+- Le profil génétique du patient
+- L'historique médical
+- Les caractéristiques spécifiques de la tumeur
+- La réponse aux traitements précédents
 
-    Recent studies show encouraging results:
-    - 30% reduction in diagnostic errors
-    - 25% improvement in 5-year survival rate
-    - Reduction of side effects through personalized treatments
+## Résultats Prometteurs
 
-    ## Challenges and Perspectives
+Des études récentes montrent des résultats encourageants :
+- 30% de réduction des erreurs diagnostiques
+- 25% d'amélioration du taux de survie à 5 ans
+- Réduction des effets secondaires grâce aux traitements personnalisés
 
-    Despite these advances, several challenges remain:
-    - Explainability of AI decisions
-    - Large-scale clinical validation
-    - Integration into existing hospital systems
-    - Ethical and regulatory questions
+## Défis et Perspectives
 
-    The future looks promising with the emergence of new techniques like federated learning and multimodal AI, which will be able to simultaneously analyze different types of medical data.
-  `;
+Malgré ces avancées, plusieurs défis demeurent :
+- L'explicabilité des décisions de l'IA
+- La validation clinique à grande échelle
+- L'intégration dans les systèmes hospitaliers existants
+- Les questions éthiques et réglementaires
+
+L'avenir s'annonce prometteur avec l'émergence de nouvelles techniques comme l'apprentissage fédéré et l'IA multimodale, qui pourront analyser simultanément différents types de données médicales.
+      `;
+    } else {
+      return `
+Artificial intelligence is revolutionizing the field of oncology in spectacular ways. Recent advances in deep learning allow doctors to diagnose certain types of cancer with accuracy that sometimes exceeds that of human experts.
+
+## Main Applications
+
+### Diagnostic Imaging
+Computer vision algorithms analyze medical images (scans, MRIs, X-rays) to detect anomalies invisible to the naked eye. This technology is particularly effective for:
+- Early lung cancer detection
+- Mammography analysis for breast cancer
+- Skin biopsy examination for melanoma
+
+### Personalized Medicine
+AI enables treatment personalization by analyzing:
+- Patient genetic profile
+- Medical history
+- Specific tumor characteristics
+- Response to previous treatments
+
+## Promising Results
+
+Recent studies show encouraging results:
+- 30% reduction in diagnostic errors
+- 25% improvement in 5-year survival rate
+- Reduction of side effects through personalized treatments
+
+## Challenges and Perspectives
+
+Despite these advances, several challenges remain:
+- Explainability of AI decisions
+- Large-scale clinical validation
+- Integration into existing hospital systems
+- Ethical and regulatory questions
+
+The future looks promising with the emergence of new techniques like federated learning and multimodal AI, which will be able to simultaneously analyze different types of medical data.
+      `;
+    }
+  };
+
+  const fullContent = getDefaultContent();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -82,11 +130,14 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             )}
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-1" />
-              {article.published_at ? new Date(article.published_at).toLocaleDateString() : 'Date inconnue'}
+              {article.published_at ? 
+                format(new Date(article.published_at), 'PPP', { locale: dateLocale }) : 
+                t('feed.unknownDate')
+              }
             </div>
             <div className="flex items-center">
               <Clock className="w-4 h-4 mr-1" />
-              Lecture : 8-10 minutes
+              {t('article.reading')}
             </div>
           </div>
         </CardHeader>
@@ -97,7 +148,7 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6 rounded-r-lg">
               <h3 className="font-semibold text-blue-800 mb-2 flex items-center">
                 <BookOpen className="w-4 h-4 mr-2" />
-                Résumé détaillé
+                {t('article.detailedSummary')}
               </h3>
               <p className="text-blue-700 leading-relaxed">{article.summary}</p>
             </div>
@@ -108,7 +159,7 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
             <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6 rounded-r-lg">
               <h3 className="font-semibold text-amber-800 mb-3 flex items-center">
                 <Lightbulb className="w-4 h-4 mr-2" />
-                Points clés à retenir
+                {t('article.keyPoints')}
               </h3>
               <ul className="space-y-2">
                 {article.key_points.map((point, index) => (
@@ -208,10 +259,10 @@ const ArticleDetail = ({ article, onBack }: ArticleDetailProps) => {
               ) : (
                 <>
                   <Badge className="bg-green-100 text-green-800 border-green-200">
-                    Intelligence Artificielle
+                    {t('article.defaultKeywords.ai')}
                   </Badge>
                   <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                    Oncologie
+                    {t('article.defaultKeywords.oncology')}
                   </Badge>
                 </>
               )}
