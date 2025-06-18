@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Plus, RefreshCw, Trash2, ExternalLink, Calendar, User, BookOpen, Eye, AlertCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -132,10 +131,8 @@ export function RSSFeedList() {
     try {
       await deleteFeedMutation.mutateAsync(feedToDelete);
       setFeedToDelete(null);
-      toast.success(t('rss.messages.feedDeletedSuccess'));
     } catch (error) {
       console.error('❌ Error deleting feed:', error);
-      toast.error(t('rss.messages.feedDeleteError'));
     }
   };
 

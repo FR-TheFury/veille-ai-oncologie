@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -175,6 +176,7 @@ export function useAddRSSFeed() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
+      queryClient.invalidateQueries({ queryKey: ['all-articles'] });
       toast.success(data.message || 'Flux RSS ajouté avec succès !');
     },
     onError: (error: any) => {
@@ -227,22 +229,35 @@ export function useDeleteRSSFeed() {
     onMutate: async (feedId: string) => {
       console.log('🔄 Mise à jour optimiste du cache...');
       
+      // Annuler toutes les requêtes en cours
       await queryClient.cancelQueries({ queryKey: ['rss-feeds'] });
+      await queryClient.cancelQueries({ queryKey: ['all-articles'] });
+      await queryClient.cancelQueries({ queryKey: ['articles', feedId] });
       
+      // Sauvegarder les données actuelles pour rollback
       const previousFeeds = queryClient.getQueryData(['rss-feeds']);
+      const previousAllArticles = queryClient.getQueryData(['all-articles']);
       
+      // Mise à jour optimiste des feeds
       queryClient.setQueryData(['rss-feeds'], (old: Feed[] | undefined) => {
         if (!old) return [];
         return old.filter(feed => feed.id !== feedId);
       });
       
-      return { previousFeeds };
+      // Mise à jour optimiste des articles
+      queryClient.setQueryData(['all-articles'], (old: CombinedArticle[] | undefined) => {
+        if (!old) return [];
+        return old.filter(article => article.feed_id !== feedId);
+      });
+      
+      return { previousFeeds, previousAllArticles };
     },
     onSuccess: (data, feedId) => {
       console.log('🎉 Suppression réussie !');
       
-      // Invalider les caches pour forcer le rechargement
+      // Invalider et refetch toutes les requêtes liées
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
+      queryClient.invalidateQueries({ queryKey: ['all-articles'] });
       queryClient.removeQueries({ queryKey: ['articles', feedId] });
       
       toast.success(`Flux "${data.feedTitle}" supprimé définitivement !`);
@@ -254,12 +269,17 @@ export function useDeleteRSSFeed() {
       if (context?.previousFeeds) {
         queryClient.setQueryData(['rss-feeds'], context.previousFeeds);
       }
+      if (context?.previousAllArticles) {
+        queryClient.setQueryData(['all-articles'], context.previousAllArticles);
+      }
       
       toast.error(`Erreur: ${error.message}`);
     },
     onSettled: () => {
       console.log('🏁 Nettoyage final du cache...');
+      // Forcer le rechargement de toutes les données
       queryClient.invalidateQueries({ queryKey: ['rss-feeds'] });
+      queryClient.invalidateQueries({ queryKey: ['all-articles'] });
     }
   });
 }
