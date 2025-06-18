@@ -1,4 +1,3 @@
-
 {
   "auth": {
     "signIn": "Sign In",
@@ -42,6 +41,136 @@
       "feedUpdated": "RSS feed updated",
       "twoHoursAgo": "2 hours ago",
       "fiveHoursAgo": "5 hours ago"
+    }
+  },
+  "about": {
+    "title": "Technology Watch in Oncology AI",
+    "subtitle": "An analysis of artificial intelligence advances in cancer treatment and diagnosis",
+    "backToFeeds": "Back to RSS Feeds",
+    "cta": "Explore RSS Feeds",
+    "projectContext": {
+      "title": "Project Context",
+      "description": "This technology watch focuses on artificial intelligence applications in oncology, a rapidly evolving field that promises to revolutionize cancer diagnosis, treatment, and patient care.",
+      "areas": {
+        "earlyDetection": {
+          "title": "Early Detection",
+          "description": "AI algorithms for early cancer screening and diagnosis"
+        },
+        "personalizedTreatment": {
+          "title": "Personalized Treatment",
+          "description": "Precision medicine tailored to individual patient profiles"
+        },
+        "acceleratedResearch": {
+          "title": "Accelerated Research",
+          "description": "Machine learning for drug discovery and clinical trials"
+        }
+      }
+    },
+    "team": {
+      "title": "Development Team",
+      "description": "This project was developed by a multidisciplinary team combining technical and medical expertise.",
+      "expertise": {
+        "technical": "Technical Development",
+        "medical": "Medical Knowledge",
+        "regulatory": "Regulatory Affairs",
+        "competitive": "Competitive Intelligence"
+      }
+    },
+    "methodology": {
+      "title": "Watch Methodology",
+      "sources": {
+        "title": "Information Sources",
+        "items": [
+          "Scientific Publications: PubMed, Nature, Science journals",
+          "Industry Reports: Market research and competitive analysis",
+          "Conference Proceedings: ASCO, HIMSS, AI conferences",
+          "Patent Databases: USPTO, EPO for innovation tracking",
+          "Regulatory Updates: FDA, EMA approval tracking"
+        ]
+      },
+      "analysis": {
+        "title": "Analysis Process",
+        "items": [
+          "Automated content aggregation via RSS feeds",
+          "Relevance scoring based on predefined criteria",
+          "Expert review and validation of key findings",
+          "Trend analysis and pattern recognition",
+          "Regular reporting and stakeholder updates"
+        ]
+      }
+    },
+    "challenges": {
+      "title": "Key Challenges Identified",
+      "ethical": {
+        "title": "Ethical Considerations",
+        "items": [
+          "Patient privacy and data protection",
+          "Algorithmic bias in healthcare decisions",
+          "Informed consent for AI-driven treatments",
+          "Transparency in AI decision-making"
+        ]
+      },
+      "technical": {
+        "title": "Technical Challenges",
+        "items": [
+          "Data quality and standardization",
+          "Interoperability between systems",
+          "Scalability of AI solutions",
+          "Real-time processing requirements"
+        ]
+      },
+      "opportunities": {
+        "title": "Market Opportunities",
+        "items": [
+          "Growing demand for precision medicine",
+          "Increased healthcare digitization",
+          "Rising cancer incidence rates",
+          "Government support for AI in healthcare"
+        ]
+      }
+    },
+    "trends": {
+      "title": "Emerging Trends",
+      "multimodal": {
+        "title": "Multimodal AI",
+        "description": "Integration of imaging, genomics, and clinical data for comprehensive patient analysis"
+      },
+      "foundation": {
+        "title": "Foundation Models",
+        "description": "Large language models adapted for medical applications and clinical decision support"
+      },
+      "explainable": {
+        "title": "Explainable AI",
+        "description": "Development of interpretable AI systems for clinical trust and regulatory compliance"
+      },
+      "edge": {
+        "title": "Edge Computing",
+        "description": "Deployment of AI models at the point of care for real-time analysis"
+      }
+    },
+    "stats": {
+      "title": "Technology Watch Statistics"
+    },
+    "objectives": {
+      "title": "MSPR 4 Objectives",
+      "technical": {
+        "title": "Technical Objectives",
+        "items": [
+          "Develop automated RSS feed aggregation system",
+          "Implement content relevance scoring algorithms",
+          "Create responsive web interface for content consumption",
+          "Design scalable architecture for data processing"
+        ]
+      },
+      "professional": {
+        "title": "Professional Development",
+        "items": [
+          "Gain expertise in healthcare technology trends",
+          "Develop competitive intelligence capabilities",
+          "Master modern web development frameworks",
+          "Build project management and documentation skills"
+        ]
+      }
     }
   },
   "nav": {
