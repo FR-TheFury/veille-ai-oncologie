@@ -18,7 +18,7 @@
   },
   "rss": {
     "title": "Flux RSS - IA & Oncologie",
-    "subtitle": "Suivez {count} sources spécialisées pour votre veille technologique",
+    "subtitle": "Suivez {{count}} sources spécialisées pour votre veille technologique",
     "mainTitle": "Veille Technologique IA & Oncologie",
     "mainSubtitle": "Restez informé des dernières avancées en intelligence artificielle appliquée à l'oncologie",
     "addFeed": "Ajouter",
@@ -54,12 +54,12 @@
     "status": {
       "error": "Erreur",
       "uncategorized": "Non catégorisé",
-      "lastUpdated": "Mis à jour: {date}",
+      "lastUpdated": "Mis à jour: {{date}}",
       "never": "Jamais",
-      "articlesCount": "{count} articles",
+      "articlesCount": "{{count}} articles",
       "active": "Actif",
       "inactive": "Inactif",
-      "updatedOn": "Mis à jour le {date}"
+      "updatedOn": "Mis à jour le {{date}}"
     },
     "messages": {
       "enterValidUrl": "Veuillez entrer une URL valide",
@@ -84,16 +84,16 @@
     "fetchArticles": "Récupérer les articles",
     "loadingArticles": "Chargement des articles...",
     "readMore": "Lire plus",
-    "score": "Score: {score}%",
-    "publishedOn": "Publié le {date}",
-    "by": "Par {author}",
+    "score": "Score: {{score}}%",
+    "publishedOn": "Publié le {{date}}",
+    "by": "Par {{author}}",
     "unknownDate": "Date inconnue"
   },
   "article": {
     "back": "Retour",
     "article": "Article",
     "summary": "Résumé",
-    "readingTime": "{minutes} min de lecture",
+    "readingTime": "{{minutes}} min de lecture",
     "keywords": "Mots-clés",
     "viewOriginal": "Voir l'article original",
     "detailedSummary": "Résumé détaillé",
@@ -272,7 +272,7 @@
     "noArticles": "Aucun article individuel ajouté",
     "noArticlesForAdmins": "Utilisez le bouton ci-dessus pour ajouter votre premier article",
     "noArticlesForUsers": "Seuls les administrateurs et managers peuvent ajouter des articles",
-    "addedOn": "Ajouté le {date}",
+    "addedOn": "Ajouté le {{date}}",
     "view": "Voir",
     "delete": "Supprimer",
     "confirmDelete": "Supprimer l'article",

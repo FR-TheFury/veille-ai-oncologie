@@ -89,7 +89,7 @@ export function RSSFeedList() {
             >
               ← {t('rss.actions.backToFeeds')}
             </Button>
-            <h2 className="text-2xl font-bold">{t('rss.actions.standaloneArticles')}</h2>
+            <h2 className="text-2xl font-bold">{t('standalone.title')}</h2>
           </div>
           {canManageContent() && (
             <Button
@@ -214,13 +214,13 @@ export function RSSFeedList() {
             className="hover:bg-purple-50 border-purple-200"
           >
             <BookOpen className="h-4 w-4 mr-2" />
-            {t('rss.actions.standaloneArticles')} ({standaloneArticles?.length || 0})
+            {t('standalone.title')} ({standaloneArticles?.length || 0})
           </Button>
         </div>
 
         {/* Liste des flux RSS */}
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-center">{t('rss.stats.feeds')}</h2>
+          <h2 className="text-2xl font-bold text-center">{t('rss.title')}</h2>
           
           {isLoadingFeeds ? (
             <div className="space-y-4">
@@ -244,12 +244,13 @@ export function RSSFeedList() {
                 <div className="text-center">
                   <BookOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500 mb-2">{t('rss.noFeeds')}</p>
+                  <p className="text-sm text-gray-400">{t('rss.noFeedsSubtitle')}</p>
                   {canManageContent() ? (
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-400 mt-2">
                       {t('rss.noFeedsForAdmins')}
                     </p>
                   ) : (
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-400 mt-2">
                       {t('rss.noFeedsForUsers')}
                     </p>
                   )}
@@ -351,7 +352,7 @@ export function RSSFeedList() {
                           <div className="flex items-center gap-1 text-gray-600 bg-white/40 px-2 py-1 rounded">
                             <Calendar className="h-3 w-3" />
                             <span>
-                              {t('rss.status.updatedOn', { 
+                              {t('rss.status.lastUpdated', { 
                                 date: format(new Date(feed.last_fetched_at), 'dd MMM yyyy', { locale: dateLocale }) 
                               })}
                             </span>
@@ -427,7 +428,7 @@ export function RSSFeedList() {
                           </div>
                           {article.source_type && (
                             <Badge variant="outline" className="text-xs">
-                              {article.source_type === 'rss' ? 'RSS' : t('rss.stats.standaloneArticles')}
+                              {article.source_type === 'rss' ? 'RSS' : t('standalone.title')}
                             </Badge>
                           )}
                         </div>
@@ -457,7 +458,7 @@ export function RSSFeedList() {
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>{t('rss.messages.cancel')}</AlertDialogCancel>
+              <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
               <AlertDialogAction 
                 onClick={handleDelete}
                 className="bg-red-600 hover:bg-red-700"

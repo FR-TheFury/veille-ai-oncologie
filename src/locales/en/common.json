@@ -18,7 +18,7 @@
   },
   "rss": {
     "title": "RSS Feeds - AI & Oncology",
-    "subtitle": "Follow {count} specialized sources for your technology watch",
+    "subtitle": "Follow {{count}} specialized sources for your technology watch",
     "mainTitle": "AI Technology Watch & Oncology",
     "mainSubtitle": "Stay informed about the latest advances in artificial intelligence applied to oncology",
     "addFeed": "Add",
@@ -54,12 +54,12 @@
     "status": {
       "error": "Error",
       "uncategorized": "Uncategorized",
-      "lastUpdated": "Updated: {date}",
+      "lastUpdated": "Updated: {{date}}",
       "never": "Never",
-      "articlesCount": "{count} articles",
+      "articlesCount": "{{count}} articles",
       "active": "Active",
       "inactive": "Inactive",
-      "updatedOn": "Updated on {date}"
+      "updatedOn": "Updated on {{date}}"
     },
     "messages": {
       "enterValidUrl": "Please enter a valid URL",
@@ -84,16 +84,16 @@
     "fetchArticles": "Fetch articles",
     "loadingArticles": "Loading articles...",
     "readMore": "Read more",
-    "score": "Score: {score}%",
-    "publishedOn": "Published on {date}",
-    "by": "By {author}",
+    "score": "Score: {{score}}%",
+    "publishedOn": "Published on {{date}}",
+    "by": "By {{author}}",
     "unknownDate": "Unknown date"
   },
   "article": {
     "back": "Back",
     "article": "Article",
     "summary": "Summary",
-    "readingTime": "{minutes} min read",
+    "readingTime": "{{minutes}} min read",
     "keywords": "Keywords",
     "viewOriginal": "View original article",
     "detailedSummary": "Detailed Summary",
@@ -272,7 +272,7 @@
     "noArticles": "No standalone articles added",
     "noArticlesForAdmins": "Use the button above to add your first article",
     "noArticlesForUsers": "Only administrators and managers can add articles",
-    "addedOn": "Added on {date}",
+    "addedOn": "Added on {{date}}",
     "view": "View",
     "delete": "Delete",
     "confirmDelete": "Delete article",
