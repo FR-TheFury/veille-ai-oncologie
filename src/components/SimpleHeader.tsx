@@ -59,7 +59,7 @@ const SimpleHeader = () => {
                   className="hover:bg-blue-50 hover:border-blue-300"
                 >
                   <LogIn className="w-4 h-4 mr-2" />
-                  Connexion
+                  {t('header.signIn')}
                 </Button>
               )
             )}

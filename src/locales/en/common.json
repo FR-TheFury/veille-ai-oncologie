@@ -28,6 +28,22 @@
     "invalidEmail": "Invalid email",
     "passwordTooShort": "Password must be at least 6 characters"
   },
+  "header": {
+    "title": "Technology Watch Center",
+    "subtitle": "Stay informed about the latest advances in oncology and health technologies",
+    "rssFeeds": "RSS Feeds",
+    "about": "About",
+    "searchPlaceholder": "Search articles...",
+    "signIn": "Sign In",
+    "notifications": {
+      "title": "Notifications",
+      "empty": "No notifications",
+      "newArticles": "New articles available",
+      "feedUpdated": "RSS feed updated",
+      "twoHoursAgo": "2 hours ago",
+      "fiveHoursAgo": "5 hours ago"
+    }
+  },
   "nav": {
     "feeds": "RSS Feeds",
     "profile": "Profile",
